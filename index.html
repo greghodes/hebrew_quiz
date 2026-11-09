@@ -2,806 +2,1052 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FP&A Hebrew Coach</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>FP&amp;A Hebrew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Light/dark tokens. One accent; red only for wrong answers. */
 :root{
---bg:#0b0d12;--bg2:#11141c;--bg3:#181c28;--bg4:#212636;
---card:#131720;--brd:#1e2436;--brd2:#2a3148;
---tx:#e6e8f0;--tx2:#878da5;--tx3:#4a5070;
---ac:#4f8fff;--ac2:#3a6fd8;--acg:rgba(79,143,255,.1);
---gn:#34d399;--gnb:rgba(52,211,153,.08);--gnr:rgba(52,211,153,.25);
---rd:#f87171;--rdb:rgba(248,113,113,.08);--rdr:rgba(248,113,113,.25);
---or:#fbbf24;--orb:rgba(251,191,36,.08);
---pr:#a78bfa;--prb:rgba(167,139,250,.08);
---cy:#22d3ee;
---r:12px;--rs:8px;
---f:'Outfit',sans-serif;--m:'JetBrains Mono',monospace;--h:'Frank Ruhl Libre',serif;
+  --bg:#ffffff;--bg2:#f5f5f7;--bg3:#e8e8ed;--line:#d2d2d7;--line2:#ececf0;
+  --tx:#1d1d1f;--tx2:#6e6e73;--tx3:#a1a1a6;
+  --ac:#0071e3;--ac-soft:rgba(0,113,227,.08);
+  --bad:#d70015;--bad-soft:rgba(215,0,21,.06);
+  --knob:#ffffff;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --he:"Heebo","SF Hebrew",-apple-system,"Segoe UI",Arial,sans-serif;
+  color-scheme:light;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% -10%,rgba(79,143,255,.05),transparent 50%);pointer-events:none}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#000000;--bg2:#1c1c1e;--bg3:#2c2c2e;--line:#3a3a3c;--line2:#1f1f21;
+  --tx:#f5f5f7;--tx2:#98989d;--tx3:#636366;
+  --ac:#0a84ff;--ac-soft:rgba(10,132,255,.14);
+  --bad:#ff453a;--bad-soft:rgba(255,69,58,.12);
+  --knob:#f5f5f7;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx);font-family:var(--sans);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-.app{max-width:520px;margin:0 auto;padding:12px 16px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative;z-index:1}
+.app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 20px) 24px calc(env(safe-area-inset-bottom) + 32px)}
+.he{font-family:var(--he);direction:rtl;unicode-bidi:isolate}
 
-/* ── HEADER ── */
-.hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 0 12px}
-.hdr-l{display:flex;align-items:center;gap:10px}
-.logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--pr));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
-.hdr-t{font-size:15px;font-weight:700;letter-spacing:-.2px}
-.hdr-r{display:flex;gap:6px}
-.hdr-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .15s}
-.hdr-btn:hover{border-color:var(--ac);color:var(--ac);background:var(--acg)}
+/* Top bar */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:48px;min-height:32px}
+.brand{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.nav{display:flex;gap:22px}
+.link{background:none;border:0;color:var(--ac);font-size:15px;cursor:pointer;padding:4px 0}
+.link.quiet{color:var(--tx2)}
 
-/* ── TOP STATS (minimal) ── */
-.top-stats{display:flex;gap:4px;margin-bottom:12px}
-.ts{flex:1;text-align:center;padding:8px 4px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rs)}
-.ts-v{font-size:18px;font-weight:700;font-family:var(--m);line-height:1}
-.ts-l{font-size:8px;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
-
-/* ── STREAK FLAME ── */
-.flame{position:relative;display:flex;align-items:center;gap:4px}
-.flame-icon{font-size:18px;transition:transform .3s}
-.flame-icon.hot{animation:flamePulse .6s ease infinite alternate}
-@keyframes flamePulse{0%{transform:scale(1)}100%{transform:scale(1.2)}}
-
-/* ── PROGRESS RING (in header) ── */
-.ring-wrap{width:32px;height:32px;position:relative}
-.ring-svg{width:32px;height:32px;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--brd);stroke-width:3}
-.ring-fg{fill:none;stroke:var(--gn);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
-.ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:var(--m);color:var(--tx2)}
-
-/* ── DAILY REVIEW BANNER ── */
-.due-banner{padding:14px 16px;background:linear-gradient(135deg,rgba(79,143,255,.08),rgba(167,139,250,.08));border:1px solid rgba(79,143,255,.15);border-radius:var(--r);margin-bottom:12px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
-.due-banner:hover{border-color:var(--ac);background:linear-gradient(135deg,rgba(79,143,255,.12),rgba(167,139,250,.12))}
-.due-num{font-size:28px;font-weight:800;font-family:var(--m);color:var(--ac);line-height:1}
-.due-txt{flex:1}
-.due-title{font-size:13px;font-weight:600}
-.due-sub{font-size:11px;color:var(--tx2)}
-.due-go{font-size:11px;font-weight:600;color:var(--ac);white-space:nowrap}
-
-/* ── SESSION PICKER ── */
-.sess-pick{display:flex;gap:6px;margin-bottom:12px}
-.sp-btn{flex:1;padding:10px 8px;border-radius:var(--rs);border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--f);transition:all .15s;text-align:center}
-.sp-btn:hover,.sp-btn.on{border-color:var(--ac);color:var(--ac);background:var(--acg)}
-.sp-btn .sp-n{display:block;font-size:18px;font-family:var(--m);font-weight:700;margin-bottom:2px}
-
-/* ── MAIN CARD ── */
-.main-card{flex:1;background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:20px;display:flex;flex-direction:column;position:relative;overflow:hidden}
-
-/* Mode selector (collapsed) */
-.mode-row{display:flex;gap:4px;margin-bottom:16px}
-.mode-btn{flex:1;padding:8px 4px;border-radius:6px;border:1px solid var(--brd);background:none;color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--f);transition:all .12s;text-align:center}
-.mode-btn.on{background:var(--bg3);color:var(--tx);border-color:var(--brd2)}
-.mode-btn:hover:not(.on){color:var(--tx2)}
-.adv-modes{display:none;gap:4px;margin-bottom:12px}
-.adv-modes.show{display:flex}
-
-/* Content */
-.content{flex:1;display:flex;flex-direction:column;justify-content:center}
-.prompt{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;line-height:1.2;text-align:center}
-.prompt-he{font-family:var(--h);font-size:42px;font-weight:900;direction:rtl;margin-bottom:6px;line-height:1.2;text-align:center;color:var(--ac)}
-.ctx{font-size:12px;color:var(--tx3);margin-bottom:16px;font-style:italic;text-align:center;min-height:16px}
-
-/* ── EXPOSE (active) ── */
-.expose{text-align:center;animation:fadeUp .25s ease}
-.expose .prompt-he{font-size:48px;margin-bottom:8px}
-.expose-en{font-size:22px;font-weight:600;margin-bottom:4px}
-.expose-hint{font-size:13px;color:var(--tx2);font-style:italic;margin-bottom:16px}
-.expose-match{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
-.expose-opt{padding:14px 20px;border-radius:var(--r);border:1px solid var(--brd);background:var(--bg2);font-family:var(--h);font-size:22px;font-weight:500;cursor:pointer;transition:all .12s;min-width:100px;text-align:center;direction:rtl;-webkit-tap-highlight-color:transparent}
-.expose-opt:hover{border-color:var(--ac);background:var(--acg)}
-.expose-opt:active{transform:scale(.97)}
-.expose-opt.right{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
-.expose-opt.wrong{border-color:var(--rd);background:var(--rdb);color:var(--rd);opacity:.5}
-
-/* ── MC (big touch targets) ── */
-.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.mc-o{padding:20px 12px;border-radius:var(--r);border:1px solid var(--brd);background:var(--bg2);cursor:pointer;text-align:right;direction:rtl;font-family:var(--h);font-size:20px;font-weight:500;transition:all .12s;color:var(--tx);-webkit-tap-highlight-color:transparent;min-height:60px;display:flex;align-items:center;justify-content:center}
-.mc-o:hover:not(.dis){border-color:var(--ac);background:var(--acg)}
-.mc-o:active:not(.dis){transform:scale(.97)}
-.mc-o.ok{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
-.mc-o.no{border-color:var(--rd);background:var(--rdb);color:var(--rd);opacity:.5}
-.mc-o.dis{cursor:default}
-.mc-o.hl{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
-
-/* ── TYPE INPUT ── */
-.irow{display:flex;gap:8px;margin-bottom:10px}
-.hinput{flex:1;padding:14px 16px;border-radius:var(--r);border:1px solid var(--brd);background:var(--bg2);color:var(--tx);font-size:22px;font-family:var(--h);font-weight:500;text-align:right;direction:rtl;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
-.hinput:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
-.einput{flex:1;padding:14px 16px;border-radius:var(--r);border:1px solid var(--brd);background:var(--bg2);color:var(--tx);font-size:16px;font-family:var(--f);font-weight:500;outline:none;transition:border-color .2s;-webkit-appearance:none}
-.einput:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
+/* Home */
+.date{font-size:15px;color:var(--tx2)}
+.headline{font-size:40px;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:6px 0 8px}
+.sub{color:var(--tx2);font-size:17px;line-height:1.4}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);margin:36px 0}
+.stat{padding:16px 0}
+.stat+.stat{padding-left:16px;border-left:1px solid var(--line2)}
+.stat-v{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-l{font-size:13px;color:var(--tx2);margin-top:2px}
+.section{margin-top:52px}
+.section-t{font-size:20px;font-weight:600;letter-spacing:-.015em;margin-bottom:6px}
+.cat{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:14px 0;border-bottom:1px solid var(--line2);font-size:15px}
+.cat-n{color:var(--tx2);font-size:13px;font-variant-numeric:tabular-nums;align-self:center}
+.bar{grid-column:1/-1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--ac)}
+.bar i.l{opacity:.3}
+.foot{margin-top:28px;font-size:13px;color:var(--tx3)}
 
 /* Buttons */
-.btn{padding:12px 20px;border-radius:var(--r);border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f);transition:all .12s;display:inline-flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:15px 20px;font-size:17px;font-weight:500;cursor:pointer;text-align:center;transition:opacity .15s}
 .btn-p{background:var(--ac);color:#fff}
-.btn-p:hover{background:var(--ac2)}
-.btn-p:active{transform:scale(.97)}
-.btn-s{background:var(--bg3);color:var(--tx2);border:1px solid var(--brd)}
-.btn-s:hover{border-color:var(--tx3);color:var(--tx)}
-.btn-sm{padding:8px 14px;font-size:12px}
-.btn-full{width:100%}
-.arow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.btn-s{background:var(--bg2);color:var(--tx)}
+.btn+.btn{margin-top:10px}
+.btn[disabled]{opacity:.35;cursor:default}
+.row-btns{display:flex;gap:10px;margin-top:16px}
+.row-btns .btn{margin-top:0}
 
-/* ── CLOZE ── */
-.cloze-s{font-family:var(--h);font-size:20px;font-weight:500;direction:rtl;text-align:right;line-height:2;margin-bottom:14px}
-.cloze-inp{display:inline-block;width:100px;padding:4px 8px;border:1px solid var(--ac);border-radius:var(--rs);background:var(--acg);color:var(--tx);font-family:var(--h);font-size:17px;font-weight:500;text-align:center;direction:rtl;outline:none;margin:0 3px;-webkit-appearance:none}
-.cloze-inp.ok{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
-.cloze-inp.no{border-color:var(--rd);background:var(--rdb);color:var(--rd)}
+/* Session */
+.sess-top{display:flex;align-items:center;gap:16px;margin-bottom:56px}
+.prog{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ac);transition:width .3s ease}
+.count{font-size:13px;color:var(--tx2);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.stage{flex:1;display:flex;flex-direction:column}
+.ask{font-size:15px;color:var(--tx2);text-align:center}
+.p-he{font-size:52px;font-weight:600;text-align:center;line-height:1.2;margin:14px 0 6px;letter-spacing:-.01em}
+.p-en{font-size:32px;font-weight:600;text-align:center;line-height:1.2;letter-spacing:-.022em;margin:14px 0 6px}
+.p-en.small{font-size:24px}
+.p-gloss{font-size:22px;text-align:center;margin-top:22px;font-weight:500}
+.tr{text-align:center;color:var(--tx2);font-size:16px;font-style:italic}
+.note{text-align:center;color:var(--tx2);font-size:14px;margin-top:12px;line-height:1.5}
+.play{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:0;background:var(--bg2);color:var(--ac);cursor:pointer;margin:18px auto 0}
+.play.big{width:96px;height:96px;margin-top:8px}
+.play.big svg{width:34px;height:34px}
 
-/* ── REORDER ── */
-.reorder-zone{min-height:56px;padding:10px;border:2px dashed var(--brd);border-radius:var(--r);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:8px;direction:rtl;transition:border-color .2s}
-.reorder-bank{display:flex;flex-wrap:wrap;gap:8px;direction:rtl;margin-bottom:10px}
-.wchip{padding:10px 16px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--brd);font-family:var(--h);font-size:17px;font-weight:500;cursor:pointer;transition:all .12s;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.wchip:active{transform:scale(.95)}
-.wchip .wchip-en{display:block;font-size:9px;color:var(--tx3);font-family:var(--f);margin-top:2px}
-.wchip.placed{opacity:.2;pointer-events:none}
-.wchip.inz{background:var(--acg);border-color:var(--ac)}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:44px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:14px 16px;font-size:17px;cursor:pointer;transition:border-color .15s,background .15s,opacity .15s}
+.opt .k{font-size:12px;color:var(--tx3);width:10px;font-variant-numeric:tabular-nums}
+.opt .t{flex:1;line-height:1.3}
+.opt .t.he{font-size:22px;text-align:right}
+@media (hover:hover){.opt:hover:not([disabled]){border-color:var(--tx3)}}
+.opt.ok{border-color:var(--ac);background:var(--ac-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.4}
+.opt[disabled]{cursor:default}
 
-/* ── AUDIO ── */
-.audio-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--pr));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:28px;transition:transform .15s;box-shadow:0 0 30px rgba(79,143,255,.15);margin:0 auto 12px;-webkit-tap-highlight-color:transparent}
-.audio-big:active{transform:scale(.93)}
+.ans{width:100%;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:26px;text-align:right;background:var(--bg);color:var(--tx);outline:none;margin-top:44px;-webkit-appearance:none}
+.ans:focus{border-color:var(--ac);box-shadow:0 0 0 4px var(--ac-soft)}
+.ans.ok{border-color:var(--ac)}
+.ans.bad{border-color:var(--bad)}
+.kb{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.kb-row{display:flex;gap:5px;justify-content:center}
+.kb button{flex:1;max-width:46px;height:44px;border:0;border-radius:8px;background:var(--bg2);font-family:var(--he);font-size:20px;cursor:pointer}
+.kb button.wide{max-width:none;flex:2;font-family:var(--sans);font-size:14px;color:var(--tx2)}
+.kb button:active{background:var(--bg3)}
 
-/* ── FEEDBACK ── */
-.fb{padding:12px;border-radius:var(--r);margin-top:12px;display:none;align-items:center;gap:10px;font-size:13px;animation:fadeUp .2s ease}
-.fb.ok{display:flex;background:var(--gnb);border:1px solid var(--gnr)}
-.fb.no{display:flex;background:var(--rdb);border:1px solid var(--rdr)}
-.fb-icon{font-size:18px}
-.fb-body{flex:1}
-.fb-ans{font-family:var(--h);font-weight:700;font-size:16px;direction:rtl}
-.fb-hint{color:var(--tx3);font-size:11px;margin-top:1px}
+.build{min-height:66px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;margin-top:36px;align-content:flex-start}
+.bank{display:flex;flex-wrap:wrap;gap:8px;direction:rtl;margin-top:22px;justify-content:center}
+.tile{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 14px;font-family:var(--he);font-size:20px;cursor:pointer}
+.tile.used{visibility:hidden}
+.tile.ok{border-color:var(--ac);color:var(--ac)}
+.tile.bad{border-color:var(--bad);color:var(--bad)}
+.tile[disabled]{cursor:default}
 
-/* ── CONFUSE ALERT ── */
-.conf-alert{padding:12px;border-radius:var(--r);background:var(--prb);border:1px solid rgba(167,139,250,.2);margin-top:10px;animation:fadeUp .2s ease}
-.conf-title{font-size:10px;font-weight:600;color:var(--pr);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.conf-row{display:flex;gap:8px;align-items:center}
-.conf-item{flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:var(--rs);border:1px solid var(--brd)}
-.conf-he{font-family:var(--h);font-size:18px;font-weight:700;direction:rtl}
-.conf-en{font-size:10px;color:var(--tx2);margin-top:2px}
+/* Feedback sits at the bottom of the stage */
+.fb{margin-top:auto;padding-top:28px}
+.fb-card{border-top:1px solid var(--line2);padding-top:20px}
+.fb-status{font-size:15px;font-weight:600;margin-bottom:10px}
+.fb-status.ok{color:var(--ac)}
+.fb-status.bad{color:var(--bad)}
+.fb-line{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.fb-he{font-size:28px;font-weight:600;line-height:1.2;text-align:right}
+.fb-en{font-size:17px;line-height:1.3}
+.fb-tr{color:var(--tx2);font-size:14px;font-style:italic;margin-top:3px}
+.fb-note{color:var(--tx2);font-size:14px;margin-top:10px;line-height:1.5}
+.fb-sent{font-size:24px;font-weight:600;line-height:1.4;text-align:right}
+.fb-bottom{display:flex;gap:10px;align-items:center;margin-top:20px}
+.fb-bottom .btn{flex:1}
+.fb-bottom .play{margin:0;flex-shrink:0;width:50px;height:50px}
 
-/* ── HINT ── */
-.hbar{padding:8px 12px;border-radius:var(--rs);background:var(--orb);border:1px solid rgba(251,191,36,.15);color:var(--or);font-size:11px;margin-bottom:10px;display:none;font-weight:500;text-align:center}
+/* Words */
+.field{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:16px;background:var(--bg);color:var(--tx);outline:none;-webkit-appearance:none}
+.field:focus{border-color:var(--ac);box-shadow:0 0 0 4px var(--ac-soft)}
+select.field{margin-top:10px;background:var(--bg2);border-color:transparent}
+.meta{font-size:13px;color:var(--tx2);margin:18px 0 4px}
+.w{display:grid;grid-template-columns:10px 1fr auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line2);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--tx3)}
+.dot.l{border-color:var(--ac)}
+.dot.k{border-color:var(--ac);background:var(--ac)}
+.w-en{font-size:15px}
+.w-tr{font-size:13px;color:var(--tx2);font-style:italic;margin-top:1px}
+.w-he{font-size:20px;font-weight:500;text-align:right}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--tx2);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:6px}
 
-/* ── SENTENCE REVEAL ── */
-.srev{padding:14px;border-radius:var(--r);background:var(--bg2);border:1px solid var(--brd);margin-top:12px;animation:fadeUp .2s ease}
-.srev-he{font-family:var(--h);font-size:20px;font-weight:700;direction:rtl;text-align:right;line-height:1.5;color:var(--gn);margin-bottom:4px}
-.srev-hint{font-size:11px;color:var(--tx2);margin-bottom:8px}
-.bdown{display:flex;flex-wrap:wrap;gap:5px;direction:rtl;margin-bottom:10px}
-.bd{padding:4px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--brd);text-align:center}
-.bd-he{font-family:var(--h);font-weight:500;font-size:13px}
-.bd-en{font-size:8px;color:var(--tx3)}
-.score{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--rs);font-size:12px;margin-bottom:10px}
-.score.g{background:var(--gnb);border:1px solid var(--gnr);color:var(--gn)}
-.score.p{background:var(--orb);border:1px solid rgba(251,191,36,.15);color:var(--or)}
-.score.m{background:var(--rdb);border:1px solid var(--rdr);color:var(--rd)}
-.score-v{font-family:var(--m);font-weight:700}
-
-/* ── BOTTOM NAV / NEXT ── */
-.bot{padding:12px 0 8px;display:flex;gap:8px}
-
-/* ── STREAK CELEBRATION ── */
-.celeb{position:fixed;inset:0;pointer-events:none;z-index:200;display:none}
-.celeb.show{display:block}
-.celeb-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:800;animation:celebPop .8s ease forwards;opacity:0}
-@keyframes celebPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
-.particle{position:absolute;width:6px;height:6px;border-radius:50%;animation:particleFly 1s ease-out forwards}
-@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
-
-/* ── SLIDE PANEL (stats/details) ── */
-.panel-overlay{position:fixed;inset:0;background:rgba(11,13,18,.7);z-index:100;display:none;-webkit-tap-highlight-color:transparent}
-.panel-overlay.show{display:block}
-.panel{position:fixed;right:0;top:0;bottom:0;width:320px;max-width:85vw;background:var(--bg2);border-left:1px solid var(--brd);z-index:101;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:20px}
-.panel.show{transform:translateX(0)}
-.panel-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:6px;border:1px solid var(--brd);background:var(--bg3);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
-.panel-title{font-size:14px;font-weight:700;margin-bottom:16px}
-.panel-section{margin-bottom:20px}
-.panel-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);margin-bottom:8px}
-
-/* SRS rows in panel */
-.srs-r{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;font-size:12px;cursor:pointer;transition:background .12s}
-.srs-r:hover{background:var(--bg3)}
-.srs-d{width:6px;height:6px;border-radius:2px;flex-shrink:0}
-.srs-l{flex:1;color:var(--tx2)}.srs-c{font-family:var(--m);color:var(--tx3);font-size:10px}
-.b0{background:var(--rd)}.b1{background:var(--or)}.b2{background:#facc15}.b3{background:var(--gn)}.b4{background:var(--ac)}
-
-/* Miss items */
-.mi{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px;border-bottom:1px solid var(--brd)}
-.mi:last-child{border-bottom:none}
-.mi-en{color:var(--tx2)}.mi-he{font-family:var(--h);font-weight:500;direction:rtl}
-.mi-c{font-family:var(--m);font-size:9px;color:var(--rd);background:var(--rdb);padding:1px 5px;border-radius:3px;margin-left:4px}
-
-/* Conf pairs in panel */
-.cp-row{display:flex;gap:6px;padding:6px 0;border-bottom:1px solid var(--brd);font-size:11px;align-items:center}
-.cp-row:last-child{border-bottom:none}
-.cp-vs{color:var(--pr);font-weight:700;font-size:10px}
-.cp-btn{margin-top:8px}
-
-/* Target rows */
-.tgt{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
-.tgt-ck{width:14px;height:14px;border-radius:3px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
-.tgt-ck.done{background:var(--gnb);border-color:var(--gn);color:var(--gn)}
-.tgt-tx{color:var(--tx2)}.tgt-tx.done{color:var(--tx3);text-decoration:line-through}
-
-.empty{text-align:center;padding:12px;color:var(--tx3);font-size:11px}
-
-/* ── OVERLAY ── */
-.ov{display:none;position:fixed;inset:0;background:rgba(11,13,18,.85);z-index:150;align-items:center;justify-content:center}
-.ov.show{display:flex}
-.ov-card{background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:28px;text-align:center;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .3s ease}
-.ov-t{font-size:22px;font-weight:700;margin-bottom:6px}
-.ov-sub{color:var(--tx2);font-size:12px;margin-bottom:16px}
-.ov-row{display:flex;justify-content:center;gap:16px;margin-bottom:16px}
-.ov-v{font-size:24px;font-weight:700;font-family:var(--m)}
-.ov-l{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px}
-
-/* HOME SCREEN */
-.home{flex:1;display:flex;flex-direction:column;gap:12px}
-
-/* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.shake{animation:shake .3s ease}
-@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-
-/* RESPONSIVE - already mobile first */
-@media(min-width:700px){.app{padding:20px;max-width:560px}}
+/* Settings */
+.set{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line2);font-size:15px}
+.set-d{font-size:13px;color:var(--tx2);margin-top:2px}
+.seg{display:flex;background:var(--bg2);border-radius:9px;padding:2px;flex-shrink:0}
+.seg button{border:0;background:none;font-size:13px;padding:6px 11px;border-radius:7px;cursor:pointer}
+.seg button.on{background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+@media (prefers-color-scheme:dark){.seg button.on{background:var(--bg3)}}
+.set select{font-size:15px;color:var(--tx);background:var(--bg2);border:0;border-radius:8px;padding:7px 10px;max-width:55%}
+.sw{position:relative;width:51px;height:31px;flex-shrink:0}
+.sw input{position:absolute;opacity:0;width:0;height:0}
+.sw span{position:absolute;inset:0;background:var(--bg3);border-radius:16px;cursor:pointer;transition:background .2s}
+.sw span::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:var(--knob);box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.sw input:checked+span{background:var(--ac)}
+.sw input:checked+span::after{transform:translateX(20px)}
+.sw input:focus-visible+span{outline:2px solid var(--ac);outline-offset:2px}
+.danger{color:var(--bad)}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
-<div class="celeb" id="celeb"></div>
-<div class="panel-overlay" id="pan-ov" onclick="closePanel()"></div>
-<div class="panel" id="panel">
-    <div class="panel-close" onclick="closePanel()">✕</div>
-    <div class="panel-title">Dashboard</div>
-    <div class="panel-section">
-        <div class="panel-label">Today's Targets</div>
-        <div id="p-targets"></div>
-    </div>
-    <div class="panel-section">
-        <div class="panel-label">SRS Mastery</div>
-        <div id="p-srs"></div>
-    </div>
-    <div class="panel-section">
-        <div class="panel-label">Confusable Pairs <span id="p-conf-ct" style="color:var(--pr);font-family:var(--m)"></span></div>
-        <div id="p-conf"></div>
-        <button class="btn btn-s btn-sm cp-btn" onclick="drillConfusables()" id="drill-conf-btn" style="display:none">⚡ Drill Confused Pairs</button>
-    </div>
-    <div class="panel-section">
-        <div class="panel-label">Weak Words <span id="p-miss-ct" style="color:var(--rd);font-family:var(--m)"></span></div>
-        <div id="p-miss"></div>
-    </div>
-</div>
-<div class="ov" id="ov">
-    <div class="ov-card">
-        <div class="ov-t" id="ov-t"></div>
-        <div class="ov-sub" id="ov-s"></div>
-        <div class="ov-row"><div><div class="ov-v" style="color:var(--gn)" id="ov-ok">0</div><div class="ov-l">Correct</div></div><div><div class="ov-v" style="color:var(--rd)" id="ov-no">0</div><div class="ov-l">Wrong</div></div><div><div class="ov-v" style="color:var(--ac)" id="ov-ac">0%</div><div class="ov-l">Accuracy</div></div></div>
-        <button class="btn btn-p btn-full" onclick="goHome()">Done →</button>
-    </div>
-</div>
+<input type="file" id="imp" accept="application/json,.json" hidden>
 
 <script>
-// ═══════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════
-const V=[
-{en:"Profit",he:["רווח"],h:"Revach",d:1,t:"N",c:"core",ctx:["הרווח עלה ברבעון","אנחנו מכוונים לרווח גבוה יותר","הרווח הגולמי השתפר"]},
-{en:"Loss",he:["הפסד"],h:"Hefsed",d:1,t:"N",c:"core",ctx:["נרשם הפסד ברבעון","ההפסד קטן משמעותית"]},
-{en:"Budget",he:["תקציב"],h:"Taktsiv",d:1,t:"N",c:"core",ctx:["התקציב אושר","חרגנו מהתקציב","צריך לעדכן את התקציב"]},
-{en:"Forecast",he:["תחזית","אומדן"],h:"Takhazit",d:2,t:"N",c:"core",ctx:["עדכנו את התחזית","התחזית אופטימית"]},
-{en:"Expense",he:["הוצאה"],h:"Hotsa'ah",d:2,t:"N",c:"core"},{en:"Revenue",he:["הכנסה"],h:"Hakhnasah",d:2,t:"N",c:"core",ctx:["ההכנסה צמחה ב-15%","ההכנסה מתחת לתחזית"]},
-{en:"Cost",he:["עלות"],h:"Alut",d:2,t:"N",c:"core"},{en:"Investment",he:["השקעה"],h:"Hashka'ah",d:2,t:"N",c:"core"},
-{en:"Cash Flow",he:["תזרים מזומנים"],h:"Tazrim Mezumanim",d:3,t:"N",c:"core"},
-{en:"Variance",he:["סטייה"],h:"Stiyah",d:3,t:"N",c:"core",ctx:["הסטייה נובעת מעלויות מעסיק","צריך להסביר את הסטייה"]},
-{en:"Target",he:["יעד"],h:"Ya'ad",d:2,t:"N",c:"core",ctx:["עמדנו ביעד","היעד לרבעון הבא"]},
-{en:"Quarter",he:["רבעון"],h:"Riv'on",d:3,t:"N",c:"core"},{en:"Margin",he:["מרווח"],h:"Mirvach",d:3,t:"N",c:"core"},
-{en:"Asset",he:["נכס"],h:"Neches",d:3,t:"N",c:"core"},{en:"Liability",he:["התחייבות"],h:"Hitchayvut",d:3,t:"N",c:"core"},
-{en:"Equity",he:["הון עצמי"],h:"Hon Atzmi",d:3,t:"N",c:"core"},{en:"Report",he:["דוח"],h:"Do'ach",d:1,t:"N",c:"core",ctx:["הדוח מוכן","תשלח את הדוח"]},
-{en:"Currency",he:["מטבע"],h:"Matbe'a",d:2,t:"N",c:"fx"},{en:"Risk",he:["סיכון"],h:"Sikun",d:2,t:"N",c:"core"},
-{en:"Tax",he:["מס"],h:"Mas",d:2,t:"N",c:"core"},{en:"Capital",he:["הון"],h:"Hon",d:2,t:"N",c:"core"},
-{en:"P&L Statement",he:["דוח רווח והפסד"],h:"Do'ach Revach VeHefsed",d:4,t:"N",c:"close"},
-{en:"Ratio",he:["יחס"],h:"Yachas",d:3,t:"N",c:"core"},{en:"Benchmark",he:["מדד ייחוס"],h:"Madad Yichus",d:3,t:"N",c:"core"},
-{en:"KPI",he:["מדד ביצוע מרכזי"],h:"Madad Bitzu'a Markazi",d:4,t:"N",c:"core"},
-{en:"Valuation",he:["הערכת שווי"],h:"Ha'arakhat Shovi",d:4,t:"N",c:"core"},
-{en:"Acquisition",he:["רכישה"],h:"Rechishah",d:3,t:"N",c:"core"},{en:"Return (ROI)",he:["תשואה"],h:"Tsu'ah",d:3,t:"N",c:"core"},
-{en:"Overhead",he:["תקורה"],h:"Tekurah",d:3,t:"N",c:"core"},{en:"Scenario",he:["תרחיש"],h:"Tarchish",d:2,t:"N",c:"core"},
-{en:"Assumption",he:["הנחה"],h:"Hanachah",d:2,t:"N",c:"core"},{en:"Trend",he:["מגמה"],h:"Megamah",d:2,t:"N",c:"core"},
-{en:"Data",he:["נתונים","מידע"],h:"Netunim",d:1,t:"N",c:"core"},{en:"Approval",he:["אישור"],h:"Ishur",d:1,t:"N",c:"core"},
-{en:"Source",he:["מקור"],h:"Makor",d:2,t:"N",c:"core"},{en:"Discount Rate",he:["שיעור הנחה"],h:"Shi'ur Hanacha",d:3,t:"N",c:"core"},
-{en:"Salary",he:["שכר","משכורת"],h:"Sachar",d:2,t:"N",c:"pay",ctx:["השכר עלה ב-3%","עלויות השכר חרגו"]},
-{en:"Commission",he:["עמלה"],h:"Amlah",d:2,t:"N",c:"pay",ctx:["העמלה לא תוקצבה","עמלות המכירות עלו"]},
-{en:"Bonus",he:["בונוס","מענק"],h:"Bonus",d:2,t:"N",c:"pay"},{en:"Headcount",he:["מצבת כוח אדם"],h:"Matzvat Ko'ach Adam",d:3,t:"N",c:"pay"},
-{en:"Position",he:["תקן","משרה"],h:"Teken",d:2,t:"N",c:"pay"},{en:"Open Position",he:["משרה פתוחה"],h:"Misrah Ptuchah",d:2,t:"N",c:"pay"},
-{en:"Employee",he:["עובד"],h:"Oved",d:1,t:"N",c:"pay"},{en:"Employer",he:["מעסיק"],h:"Ma'asik",d:2,t:"N",c:"pay"},
-{en:"Employer Costs",he:["עלויות מעסיק"],h:"Aluyot Ma'asik",d:3,t:"N",c:"pay"},
-{en:"Recruitment",he:["גיוס"],h:"Giyus",d:2,t:"N",c:"pay"},{en:"Termination",he:["פיטורים"],h:"Piturim",d:2,t:"N",c:"pay"},
-{en:"Pension",he:["פנסיה"],h:"Pensiah",d:2,t:"N",c:"pay"},{en:"Severance",he:["פיצויים"],h:"Pitzuyim",d:3,t:"N",c:"pay"},
-{en:"Salary Raise",he:["העלאת שכר"],h:"Ha'ala'at Sachar",d:2,t:"N",c:"pay"},
-{en:"Department",he:["מחלקה"],h:"Machlakah",d:1,t:"N",c:"pay"},{en:"Social Security",he:["ביטוח לאומי"],h:"Bitu'ach Le'umi",d:3,t:"N",c:"pay"},
-{en:"Benefits",he:["הטבות"],h:"Hatavot",d:2,t:"N",c:"pay"},
-{en:"Monthly Close",he:["סגירה חודשית"],h:"Sgirah Chodshit",d:3,t:"N",c:"close"},
-{en:"Accrual",he:["צבירה","הפרשה"],h:"Tzvirah",d:3,t:"N",c:"close"},{en:"Provision",he:["הפרשה"],h:"Hafrashah",d:3,t:"N",c:"close"},
-{en:"Reconciliation",he:["התאמה"],h:"Hat'amah",d:3,t:"N",c:"close"},{en:"Journal Entry",he:["פקודת יומן"],h:"Pkudat Yoman",d:3,t:"N",c:"close"},
-{en:"Balance Sheet",he:["מאזן"],h:"Ma'azan",d:3,t:"N",c:"close"},{en:"Actual",he:["ביצוע"],h:"Bitzu'a",d:2,t:"N",c:"close"},
-{en:"Guidance",he:["הנחיה"],h:"Hanchayah",d:3,t:"N",c:"close"},{en:"Overrun",he:["חריגה"],h:"Charigah",d:3,t:"N",c:"close"},
-{en:"Depreciation",he:["פחת"],h:"Pachat",d:3,t:"N",c:"close"},{en:"Amortization",he:["הפחתה"],h:"Hafchatah",d:3,t:"N",c:"close"},
-{en:"COGS",he:["עלות המכר"],h:"Alut HaMecher",d:3,t:"N",c:"close"},
-{en:"Gross Profit",he:["רווח גולמי"],h:"Revach Golmi",d:3,t:"N",c:"close"},
-{en:"Operating Profit",he:["רווח תפעולי"],h:"Revach Tif'uli",d:3,t:"N",c:"close"},
-{en:"Net Profit",he:["רווח נקי"],h:"Revach Naki",d:3,t:"N",c:"close"},
-{en:"Exchange Rate",he:["שער חליפין"],h:"Sha'ar Chalifin",d:3,t:"N",c:"fx",ctx:["שער החליפין השפיע על התוצאות"]},
-{en:"FX Impact",he:["השפעת מט\"ח"],h:"Hashpa'at Matach",d:3,t:"N",c:"fx"},
-{en:"Constant Currency",he:["מטבע קבוע"],h:"Matbe'a Kavu'a",d:3,t:"N",c:"fx"},
-{en:"Hedge",he:["גידור"],h:"Gidur",d:3,t:"N",c:"fx"},{en:"Revaluation",he:["שערוך"],h:"She'aruch",d:4,t:"N",c:"fx"},
-{en:"To Calculate",he:["לחשב"],h:"Lechashev",d:2,t:"V",c:"verb"},{en:"To Analyze",he:["לנתח"],h:"Lenate'ach",d:3,t:"V",c:"verb"},
-{en:"To Budget",he:["לתקצב"],h:"Letaktzev",d:3,t:"V",c:"verb"},{en:"To Report",he:["לדווח"],h:"Ledave'ach",d:2,t:"V",c:"verb"},
-{en:"To Review",he:["לבדוק"],h:"Livdok",d:1,t:"V",c:"verb"},{en:"To Approve",he:["לאשר"],h:"Le'asher",d:2,t:"V",c:"verb"},
-{en:"To Increase",he:["להגדיל"],h:"Lehagdil",d:2,t:"V",c:"verb"},{en:"To Reduce",he:["להקטין"],h:"Lehaktin",d:2,t:"V",c:"verb"},
-{en:"To Compare",he:["להשוות"],h:"Lehashvot",d:3,t:"V",c:"verb"},{en:"To Forecast",he:["לחזות"],h:"Lachazot",d:3,t:"V",c:"verb"},
-{en:"To Allocate",he:["להקצות"],h:"Lehaktsot",d:3,t:"V",c:"verb"},{en:"To Reconcile",he:["ליישב","להתאים"],h:"Leyashev",d:4,t:"V",c:"verb"},
-{en:"To Track",he:["לעקוב"],h:"La'akov",d:2,t:"V",c:"verb"},{en:"To Present",he:["להציג"],h:"Lehatzig",d:2,t:"V",c:"verb"},
-{en:"To Manage",he:["לנהל"],h:"Lenahel",d:2,t:"V",c:"verb"},{en:"To Execute",he:["לבצע"],h:"Levatze'a",d:3,t:"V",c:"verb"},
-{en:"To Correct",he:["לתקן"],h:"Letaken",d:2,t:"V",c:"verb"},{en:"To Define",he:["להגדיר"],h:"Lehagdir",d:2,t:"V",c:"verb"},
-{en:"To Streamline",he:["לייעל"],h:"Leya'el",d:3,t:"V",c:"verb"},{en:"To Validate",he:["לאמת","לתקף"],h:"Le'amet",d:3,t:"V",c:"verb"},
-{en:"To Clarify",he:["להבהיר"],h:"Lehavhir",d:2,t:"V",c:"verb"},{en:"To Update",he:["לעדכן"],h:"Le'adken",d:1,t:"V",c:"verb"},
-{en:"To Document",he:["לתעד"],h:"Leta'ed",d:2,t:"V",c:"verb"},{en:"To Prioritize",he:["לתעדף"],h:"Letaddef",d:2,t:"V",c:"verb"},
-{en:"To Exclude",he:["לשלול"],h:"Lishlol",d:3,t:"V",c:"verb"},{en:"To Send",he:["לשלוח"],h:"Lishlo'ach",d:1,t:"V",c:"off"},
-{en:"To Receive",he:["לקבל"],h:"Lekabel",d:1,t:"V",c:"off"},{en:"To Prepare",he:["להכין"],h:"Lehachin",d:1,t:"V",c:"off"},
-{en:"To Explain",he:["להסביר"],h:"Lehasbir",d:1,t:"V",c:"off"},{en:"To Understand",he:["להבין"],h:"Lehavin",d:1,t:"V",c:"off"},
-{en:"To Discuss",he:["לדון"],h:"Ladon",d:2,t:"V",c:"off"},{en:"To Confirm",he:["לאשר"],h:"Le'asher",d:2,t:"V",c:"off"},
-{en:"To Cancel",he:["לבטל"],h:"Levatel",d:2,t:"V",c:"off"},{en:"To Share",he:["לשתף"],h:"Leshattef",d:2,t:"V",c:"off"},
-{en:"To Suggest",he:["להציע"],h:"Lehatzi'a",d:2,t:"V",c:"off"},{en:"To Negotiate",he:["לנהל משא ומתן"],h:"Lenahel Masa U'Matan",d:2,t:"V",c:"off"},
-{en:"Year over Year",he:["שנה מול שנה"],h:"Shanah Mul Shanah",d:2,t:"P",c:"phr"},
-{en:"Bottom Line",he:["שורה תחתונה"],h:"Shurah Tachtonah",d:2,t:"P",c:"phr"},
-{en:"Top Line",he:["שורה עליונה"],h:"Shurah Elyonah",d:2,t:"P",c:"phr"},
-{en:"Budget vs Actual",he:["תקציב מול ביצוע"],h:"Taktziv Mul Bitzu'a",d:2,t:"P",c:"phr"},
-{en:"Cost Center",he:["מרכז עלות"],h:"Merkaz Alut",d:2,t:"P",c:"phr"},
-{en:"Break Even",he:["נקודת איזון"],h:"Nekudat Izun",d:3,t:"P",c:"phr"},
-{en:"Working Capital",he:["הון חוזר"],h:"Hon Chozer",d:3,t:"P",c:"phr"},
-{en:"Financial Statements",he:["דוחות כספיים"],h:"Dochot Kaspi'im",d:2,t:"P",c:"phr"},
-{en:"Fiscal Year",he:["שנת כספים"],h:"Shnat Kaspim",d:2,t:"P",c:"phr"},
-{en:"Revenue Share",he:["חלוקת הכנסות"],h:"Chalukat Hakhnasot",d:3,t:"P",c:"phr"},
-{en:"Run Rate",he:["קצב ריצה"],h:"Ketzev Ritzah",d:3,t:"P",c:"phr"},
-{en:"Revenue Recognition",he:["הכרה בהכנסה"],h:"Hakarah BeHakhnasah",d:4,t:"P",c:"phr"},
-{en:"Board of Directors",he:["דירקטוריון"],h:"Direktorion",d:2,t:"P",c:"phr"},
-];
+(function(){
+'use strict';
 
-const S=[
-{en:"The budget was approved",he:"התקציב אושר",h:"HaTaktziv Ushar",d:1,w:[{h:"התקציב",e:"the budget"},{h:"אושר",e:"approved"}],cl:[1]},
-{en:"We need to update the forecast",he:"אנחנו צריכים לעדכן את התחזית",h:"Anachnu Tzrichim Le'adken Et HaTakhazit",d:1,w:[{h:"אנחנו",e:"we"},{h:"צריכים",e:"need"},{h:"לעדכן",e:"to update"},{h:"את",e:"(acc.)"},{h:"התחזית",e:"forecast"}],cl:[2,4]},
-{en:"Revenue increased this quarter",he:"ההכנסה עלתה הרבעון הזה",h:"HaHakhnasah Altah HaRiv'on",d:1,w:[{h:"ההכנסה",e:"revenue"},{h:"עלתה",e:"increased"},{h:"הרבעון",e:"quarter"},{h:"הזה",e:"this"}],cl:[0,1]},
-{en:"Please send the report",he:"בבקשה תשלח את הדוח",h:"Bevakashah Tishlach Et HaDo'ach",d:1,w:[{h:"בבקשה",e:"please"},{h:"תשלח",e:"send"},{h:"את",e:"(acc.)"},{h:"הדוח",e:"the report"}],cl:[1,3]},
-{en:"Costs went up this month",he:"העלויות עלו החודש",h:"HaAluyot Alu HaChodesh",d:1,w:[{h:"העלויות",e:"costs"},{h:"עלו",e:"went up"},{h:"החודש",e:"this month"}],cl:[0,1]},
-{en:"We closed the month",he:"סגרנו את החודש",h:"Sagarnu Et HaChodesh",d:1,w:[{h:"סגרנו",e:"we closed"},{h:"את",e:"(acc.)"},{h:"החודש",e:"the month"}],cl:[0]},
-{en:"I will prepare the presentation",he:"אני אכין את המצגת",h:"Ani Achin Et HaMatzeget",d:1,w:[{h:"אני",e:"I"},{h:"אכין",e:"will prepare"},{h:"את",e:"(acc.)"},{h:"המצגת",e:"presentation"}],cl:[1,3]},
-{en:"The profit exceeded expectations",he:"הרווח חרג מהציפיות",h:"HaRevach Charag MeHaTzipiyot",d:1,w:[{h:"הרווח",e:"profit"},{h:"חרג",e:"exceeded"},{h:"מהציפיות",e:"expectations"}],cl:[0,1]},
-{en:"Can you check these numbers?",he:"אתה יכול לבדוק את המספרים האלה",h:"Atah Yachol Livdok Et HaMisparim",d:1,w:[{h:"אתה",e:"you"},{h:"יכול",e:"can"},{h:"לבדוק",e:"to check"},{h:"את",e:"(acc.)"},{h:"המספרים",e:"the numbers"},{h:"האלה",e:"these"}],cl:[2,4]},
-{en:"We need to discuss this",he:"אנחנו צריכים לדון בזה",h:"Anachnu Tzrichim Ladon BeZeh",d:1,w:[{h:"אנחנו",e:"we"},{h:"צריכים",e:"need"},{h:"לדון",e:"to discuss"},{h:"בזה",e:"in this"}],cl:[2]},
-{en:"The variance is driven by employer costs",he:"הסטייה נובעת מעלויות מעסיק",h:"HaStiyah Nove'at Me'Aluyot Ma'asik",d:2,w:[{h:"הסטייה",e:"variance"},{h:"נובעת",e:"driven by"},{h:"מעלויות",e:"from costs"},{h:"מעסיק",e:"employer"}],cl:[0,2,3]},
-{en:"We need to reconcile payroll against budget",he:"אנחנו צריכים להתאים את השכר מול התקציב",h:"Lehat'im Et HaSachar Mul HaTaktziv",d:2,w:[{h:"אנחנו",e:"we"},{h:"צריכים",e:"need"},{h:"להתאים",e:"reconcile"},{h:"את",e:"(acc.)"},{h:"השכר",e:"payroll"},{h:"מול",e:"against"},{h:"התקציב",e:"budget"}],cl:[2,4,6]},
-{en:"The forecast assumes a 3% salary increase",he:"התחזית מניחה העלאת שכר של 3%",h:"HaTakhazit Manicha Ha'ala'at Sachar",d:2,w:[{h:"התחזית",e:"forecast"},{h:"מניחה",e:"assumes"},{h:"העלאת שכר",e:"salary raise"},{h:"של",e:"of"},{h:"3%",e:"3%"}],cl:[0,1,2]},
-{en:"Revenue was below budget due to FX impact",he:"ההכנסה הייתה מתחת לתקציב בגלל השפעת מט\"ח",h:"HaHakhnasah Mitachat LaTaktziv Biglal Hashpa'at Matach",d:2,w:[{h:"ההכנסה",e:"revenue"},{h:"הייתה",e:"was"},{h:"מתחת",e:"below"},{h:"לתקציב",e:"budget"},{h:"בגלל",e:"due to"},{h:"השפעת",e:"impact"},{h:"מט\"ח",e:"FX"}],cl:[0,2,5,6]},
-{en:"The commission was not included in budget",he:"העמלה לא נכללה בתקציב",h:"HaAmlah Lo Nichlelah BaTaktziv",d:2,w:[{h:"העמלה",e:"commission"},{h:"לא",e:"not"},{h:"נכללה",e:"included"},{h:"בתקציב",e:"in budget"}],cl:[0,2]},
-{en:"Gross margin improved by two percent",he:"המרווח הגולמי השתפר בשני אחוזים",h:"HaMirvach HaGolmi Hishtaper",d:2,w:[{h:"המרווח",e:"margin"},{h:"הגולמי",e:"gross"},{h:"השתפר",e:"improved"},{h:"בשני",e:"by two"},{h:"אחוזים",e:"percent"}],cl:[0,1,2]},
-{en:"Actual results exceeded the guidance",he:"תוצאות הביצוע חרגו מההנחיה",h:"Totza'ot HaBitzu'a Chargu",d:2,w:[{h:"תוצאות",e:"results"},{h:"הביצוע",e:"actual"},{h:"חרגו",e:"exceeded"},{h:"מההנחיה",e:"guidance"}],cl:[1,2,3]},
-{en:"I recommend we increase the provision",he:"אני ממליץ שנגדיל את ההפרשה",h:"Ani Mamlitz SheNagdil Et HaHafrashah",d:2,w:[{h:"אני",e:"I"},{h:"ממליץ",e:"recommend"},{h:"שנגדיל",e:"increase"},{h:"את",e:"(acc.)"},{h:"ההפרשה",e:"provision"}],cl:[1,2,4]},
-{en:"We have five open positions in finance",he:"יש לנו חמש משרות פתוחות בכספים",h:"Yesh Lanu Chamesh Misrot Ptuchot",d:2,w:[{h:"יש לנו",e:"we have"},{h:"חמש",e:"five"},{h:"משרות",e:"positions"},{h:"פתוחות",e:"open"},{h:"בכספים",e:"in finance"}],cl:[0,2,3]},
-{en:"We need to allocate budget to this department",he:"צריך להקצות תקציב למחלקה הזאת",h:"Tzarich Lehaktzot Taktziv LaMachlakah",d:2,w:[{h:"צריך",e:"need"},{h:"להקצות",e:"allocate"},{h:"תקציב",e:"budget"},{h:"למחלקה",e:"department"},{h:"הזאת",e:"this"}],cl:[1,2,3]},
-{en:"The exchange rate affected the bottom line",he:"שער החליפין השפיע על השורה התחתונה",h:"Sha'ar HaChalifin Hishpi'a Al HaShurah HaTachtonah",d:2,w:[{h:"שער החליפין",e:"exchange rate"},{h:"השפיע",e:"affected"},{h:"על",e:"on"},{h:"השורה התחתונה",e:"bottom line"}],cl:[0,1,3]},
-{en:"Depreciation increased following new investments",he:"הפחת עלה בעקבות השקעות חדשות",h:"HaPachat Alah Be'ikvot Hashka'ot",d:2,w:[{h:"הפחת",e:"depreciation"},{h:"עלה",e:"increased"},{h:"בעקבות",e:"following"},{h:"השקעות",e:"investments"},{h:"חדשות",e:"new"}],cl:[0,1,3]},
-{en:"We need to compare year over year",he:"אנחנו צריכים להשוות שנה מול שנה",h:"Lehashvot Shanah Mul Shanah",d:2,w:[{h:"אנחנו",e:"we"},{h:"צריכים",e:"need"},{h:"להשוות",e:"compare"},{h:"שנה",e:"year"},{h:"מול",e:"vs"},{h:"שנה",e:"year"}],cl:[2,3]},
-{en:"The variance is primarily driven by unbudgeted commissions",he:"הסטייה נובעת בעיקר מעמלות שלא תוקצבו",h:"HaStiyah Nove'at Be'ikar Me'Amlot SheLo Tuktzvu",d:3,w:[{h:"הסטייה",e:"variance"},{h:"נובעת",e:"driven"},{h:"בעיקר",e:"primarily"},{h:"מעמלות",e:"from commissions"},{h:"שלא",e:"that not"},{h:"תוקצבו",e:"budgeted"}],cl:[0,2,3,5]},
-{en:"Excluding FX, revenue grew 12% in constant currency",he:"בניטרול מט\"ח ההכנסה צמחה ב-12% במטבע קבוע",h:"BeNitrul Matach HaHakhnasah Tzamchah BeMatbe'a Kavu'a",d:3,w:[{h:"בניטרול",e:"excluding"},{h:"מט\"ח",e:"FX"},{h:"ההכנסה",e:"revenue"},{h:"צמחה",e:"grew"},{h:"במטבע קבוע",e:"constant currency"}],cl:[0,3,4]},
-{en:"OpEx came in 500K above budget due to recruitment",he:"הוצאות התפעול חרגו ב-500 אלף בגלל עלויות גיוס",h:"Hotza'ot HaTif'ul Chargu Biglal Aluyot Giyus",d:3,w:[{h:"הוצאות התפעול",e:"OpEx"},{h:"חרגו",e:"exceeded"},{h:"ב-500 אלף",e:"by 500K"},{h:"בגלל",e:"due to"},{h:"עלויות גיוס",e:"recruitment costs"}],cl:[0,1,4]},
-{en:"Headcount was three below plan — we froze open positions",he:"מצבת כוח האדם הייתה שלוש מתחת לתוכנית כי הקפאנו משרות פתוחות",h:"Matzvat Ko'ach HaAdam Mitachat LaTochnit",d:3,w:[{h:"מצבת כוח האדם",e:"headcount"},{h:"הייתה",e:"was"},{h:"שלוש",e:"three"},{h:"מתחת",e:"below"},{h:"לתוכנית",e:"plan"},{h:"הקפאנו",e:"we froze"},{h:"משרות פתוחות",e:"open positions"}],cl:[0,3,5,6]},
-{en:"We booked an accrual for expected severance",he:"רשמנו הפרשה עבור תשלומי הפיצויים הצפויים",h:"Rashamnu Hafrashah Avur Tashlumey HaPitzuyim",d:3,w:[{h:"רשמנו",e:"we booked"},{h:"הפרשה",e:"accrual"},{h:"עבור",e:"for"},{h:"תשלומי",e:"payments"},{h:"הפיצויים",e:"severance"},{h:"הצפויים",e:"expected"}],cl:[0,1,4]},
-{en:"Walk me through the budget vs actual bridge",he:"תסביר לי את הגשר בין תקציב לביצוע",h:"Tasbir Li Et HaGesher Bein Taktziv LeBitzu'a",d:3,w:[{h:"תסביר",e:"explain"},{h:"לי",e:"to me"},{h:"את",e:"(acc.)"},{h:"הגשר",e:"bridge"},{h:"בין",e:"between"},{h:"תקציב",e:"budget"},{h:"לביצוע",e:"actual"}],cl:[0,3,5,6]},
-{en:"The run rate suggests we'll finish above target",he:"קצב הריצה מצביע על כך שנסיים מעל היעד",h:"Ketzev HaRitzah Matzbiya SheNesayem Me'al HaYa'ad",d:3,w:[{h:"קצב הריצה",e:"run rate"},{h:"מצביע",e:"suggests"},{h:"שנסיים",e:"we'll finish"},{h:"מעל",e:"above"},{h:"היעד",e:"target"}],cl:[0,1,3,4]},
-{en:"Revenue share partners generated 40% of GMV",he:"שותפי חלוקת ההכנסות ייצרו 40% מסך ה-GMV",h:"Shutfey Chalukat HaHakhnasot Yitzru",d:3,w:[{h:"שותפי",e:"partners"},{h:"חלוקת ההכנסות",e:"revenue share"},{h:"ייצרו",e:"generated"},{h:"40%",e:"40%"},{h:"מסך",e:"of total"}],cl:[0,1,2]},
-{en:"EBITDA margin declined quarter over quarter",he:"שולי ה-EBITDA ירדו רבעון מול רבעון",h:"Shuley HaEBITDA Yardu Riv'on Mul Riv'on",d:3,w:[{h:"שולי",e:"margin"},{h:"ירדו",e:"declined"},{h:"רבעון",e:"quarter"},{h:"מול",e:"vs"},{h:"רבעון",e:"quarter"}],cl:[0,1]},
-{en:"I suggest a sensitivity analysis on FX assumptions",he:"אני מציע ניתוח רגישות על הנחות שער החליפין",h:"Ani Matzi'a Nitu'ach Regishut Al Hanachot Sha'ar HaChalifin",d:3,w:[{h:"אני",e:"I"},{h:"מציע",e:"suggest"},{h:"ניתוח רגישות",e:"sensitivity analysis"},{h:"על",e:"on"},{h:"הנחות",e:"assumptions"},{h:"שער החליפין",e:"exchange rate"}],cl:[1,2,4,5]},
-{en:"We need to bridge the gap between forecast and actual",he:"אנחנו צריכים לגשר על הפער בין התחזית לביצוע",h:"Legasher Al HaPe'er Bein HaTakhazit LaBitzu'a",d:3,w:[{h:"אנחנו",e:"we"},{h:"צריכים",e:"need"},{h:"לגשר",e:"bridge"},{h:"על",e:"over"},{h:"הפער",e:"gap"},{h:"בין",e:"between"},{h:"התחזית",e:"forecast"},{h:"לביצוע",e:"actual"}],cl:[2,4,6,7]},
-{en:"Payroll is the main driver of the budget overrun",he:"השכר הוא הגורם העיקרי לחריגה מהתקציב",h:"HaSachar Hu HaGorem HaIkari LaCharigah",d:3,w:[{h:"השכר",e:"payroll"},{h:"הוא",e:"is"},{h:"הגורם",e:"driver"},{h:"העיקרי",e:"main"},{h:"לחריגה",e:"overrun"},{h:"מהתקציב",e:"from budget"}],cl:[0,2,4,5]},
-{en:"Operating expenses are trending above plan",he:"הוצאות התפעול במגמת עלייה מעל התוכנית",h:"Hotza'ot HaTif'ul BeMigmat Aliyah Me'al HaTochnit",d:3,w:[{h:"הוצאות התפעול",e:"OpEx"},{h:"במגמת",e:"trending"},{h:"עלייה",e:"increase"},{h:"מעל",e:"above"},{h:"התוכנית",e:"plan"}],cl:[0,1,3,4]},
-{en:"Net profit was impacted by one-time severance costs",he:"הרווח הנקי הושפע מעלויות פיצויים חד פעמיות",h:"HaRevach HaNaki Hushpa Me'Aluyot Pitzuyim Chad Pa'amiyot",d:3,w:[{h:"הרווח הנקי",e:"net profit"},{h:"הושפע",e:"impacted"},{h:"מעלויות",e:"from costs"},{h:"פיצויים",e:"severance"},{h:"חד פעמיות",e:"one-time"}],cl:[0,1,3,4]},
-{en:"Working capital improved due to better collections",he:"ההון החוזר השתפר בזכות גבייה טובה יותר",h:"HaHon HaChozer Hishtaper Bizchut Gviyah Tovah Yoter",d:3,w:[{h:"ההון החוזר",e:"working capital"},{h:"השתפר",e:"improved"},{h:"בזכות",e:"due to"},{h:"גבייה",e:"collections"},{h:"טובה יותר",e:"better"}],cl:[0,1,3]},
-];
+// ─────────────────────────────────────────────────────────────
+// CONTENT
+// Format: category|English|Hebrew (accepted alternatives after ;)|transliteration|note
+// Notes flag what people actually say in Israeli offices where it differs from the formal term.
+// ─────────────────────────────────────────────────────────────
+const CATS = {
+  core:'P&L and planning',
+  saas:'Subscription revenue',
+  close:'Accounting and close',
+  cash:'Billing, cash and collections',
+  people:'People and payroll',
+  channel:'Channel and market',
+  verbs:'Verbs',
+  meet:'Meeting language'
+};
 
-const CONF=[["הפרשה","הפחתה","Provision","Amortization"],["סטייה","חריגה","Variance","Overrun"],["התאמה","הנחה","Reconciliation","Assumption"],["הכנסה","הוצאה","Revenue","Expense"],["רווח גולמי","רווח תפעולי","Gross Profit","Operating Profit"],["רווח","מרווח","Profit","Margin"],["לאשר","לאמת","To Approve","To Validate"],["להגדיל","להגדיר","To Increase","To Define"]];
+const VOCAB_RAW = `
+core|Revenue|הכנסות;הכנסה|hakhnasot|Plural is the norm in reports and meetings
+core|Expenses|הוצאות;הוצאה|hotsa'ot|
+core|Cost|עלות|alut|Plural: עלויות
+core|Profit|רווח|revakh|
+core|Loss|הפסד|hefsed|
+core|Gross profit|רווח גולמי|revakh golmi|
+core|Gross margin|שיעור רווח גולמי|shi'ur revakh golmi|In speech often "מרג'ין גולמי"
+core|Operating profit|רווח תפעולי|revakh tif'uli|
+core|Operating expenses|הוצאות תפעול;הוצאות תפעוליות|hotsa'ot tif'ul|In meetings usually just "אופקס"
+core|Net profit|רווח נקי|revakh naki|
+core|Cost of revenue|עלות המכר;עלות ההכנסות|alut ha-mekher|Literally "cost of sales"
+core|Research and development|מחקר ופיתוח;מו"פ|mekhkar u-fitu'akh|Abbreviated מו"פ
+core|Sales and marketing|מכירות ושיווק;שיווק ומכירות|mekhirot ve-shivuk|
+core|General and administrative|הנהלה וכלליות;הנו"כ|hanhala u-klaliyot|Abbreviated הנו"כ
+core|Budget|תקציב|taktsiv|
+core|Forecast|תחזית|takhazit|In meetings often just "פורקאסט"
+core|Actuals|ביצוע;ביצועים|bitsu'a|Budget vs actual = תקציב מול ביצוע
+core|Variance|פער;סטייה|pa'ar|פער is what you'll hear most; סטייה is more formal
+core|Target|יעד|ya'ad|
+core|Plan|תוכנית;תכנית|tokhnit|
+core|Quarter|רבעון|riv'on|
+core|Fiscal year|שנת כספים|shnat ksafim|
+core|Assumption|הנחה|hanakha|Same word as "discount"
+core|Scenario|תרחיש|tarkhish|
+core|Trend|מגמה|megama|
+core|Growth|צמיחה|tsmikha|
+core|Run rate|קצב שנתי|ketsev shnati|In speech usually "ראן רייט"
+core|Year over year|לעומת שנה קודמת|le'umat shana kodemet|Also "שנה על שנה"
+core|Bottom line|שורה תחתונה|shura takhtona|
+core|Board of directors|דירקטוריון|direktoryon|
+core|Management|הנהלה|hanhala|
+core|Financial statements|דוחות כספיים|dokhot kaspiyim|
+core|Report|דוח|do'akh|Plural: דוחות
+core|Breakeven|נקודת איזון|nekudat izun|
+core|Sensitivity analysis|ניתוח רגישות|nitu'akh regishut|
+core|Discount rate|שיעור היוון|shi'ur hivun|Not שיעור הנחה, which is a price discount
+core|Valuation|הערכת שווי|ha'arakhat shovi|
+core|Investment|השקעה|hashka'a|
+core|Cash burn|שריפת מזומנים|srefat mezumanim|Usually just "ברן"
+core|Exchange rate|שער חליפין|sha'ar khalifin|
+core|Foreign currency|מטבע חוץ;מט"ח|matbe'a khuts|Abbreviated מט"ח
+core|Constant currency|מטבע קבוע|matbe'a kavu'a|Excluding FX = בנטרול מט"ח
+core|Hedging|גידור|gidur|
+saas|Recurring revenue|הכנסות חוזרות|hakhnasot khozrot|
+saas|Subscription|מנוי|minui|
+saas|Renewal|חידוש|khidush|
+saas|Churn|נטישה|netisha|In speech mostly "צ'רן"
+saas|Retention|שימור|shimur|
+saas|Expansion|הרחבה|harkhava|Upsell is usually just "אפסייל"
+saas|Downgrade|צמצום|tsimtsum|
+saas|Usage|צריכה;שימוש|tsrikha|
+saas|Consumption-based|מבוסס צריכה|mevusas tsrikha|
+saas|Pricing|תמחור|timkhur|
+saas|Price list|מחירון|mekhiron|
+saas|Price increase|העלאת מחיר|ha'ala'at mekhir|
+saas|Discount|הנחה|hanakha|Same word as "assumption"
+saas|License|רישיון|rishayon|Plural: רישיונות
+saas|Contract|חוזה;הסכם|khoze|הסכם = agreement
+saas|Contract term|תקופת התקשרות|tkufat hitkashrut|
+saas|Annual contract|חוזה שנתי|khoze shnati|
+saas|Bookings|הזמנות|hazmanot|Literally "orders"; often just "בוקינגס"
+saas|Backlog|צבר הזמנות;צבר|tsvar hazmanot|
+saas|Deferred revenue|הכנסות מראש;הכנסות נדחות|hakhnasot merosh|Israeli balance sheets use הכנסות מראש
+saas|Revenue recognition|הכרה בהכנסה|hakara be-hakhnasa|
+saas|Performance obligation|מחויבות ביצוע|mekhuyavut bitsu'a|IFRS 15 / ASC 606 term
+saas|New customer|לקוח חדש|lako'akh khadash|
+saas|Customer|לקוח|lako'akh|Plural לקוחות also means receivables
+saas|Average deal size|גודל עסקה ממוצע|godel iska memutsa|
+saas|Free trial|תקופת ניסיון|tkufat nisayon|
+close|Month-end close|סגירת חודש;סגירה חודשית|sgirat khodesh|
+close|Journal entry|פקודת יומן|pkudat yoman|
+close|Reconciliation|התאמה|hat'ama|Bank reconciliation = התאמת בנק
+close|Accrual / provision|הפרשה|hafrasha|
+close|Accrued expenses|הוצאות לשלם|hotsa'ot leshalem|
+close|Prepaid expenses|הוצאות מראש|hotsa'ot merosh|
+close|Depreciation|פחת|pakhat|
+close|Amortisation|הפחתה|hafkhata|Easy to confuse with הפרשה (provision)
+close|Balance sheet|מאזן|ma'azan|
+close|Income statement|דוח רווח והפסד|do'akh revakh ve-hefsed|Often shortened to דוח רו"ה
+close|Trial balance|מאזן בוחן|ma'azan bokhen|
+close|General ledger|ספר ראשי|sefer rashi|
+close|Ledger card|כרטסת|kartset|The account detail you pull from the ledger
+close|Account|חשבון|kheshbon|
+close|Adjustment|תיאום|te'um|
+close|Reclassification|סיווג מחדש|sivug me-khadash|
+close|Asset|נכס|nekhes|
+close|Liability|התחייבות|hitkhayvut|Also "commitment"
+close|Equity|הון עצמי|hon atsmi|
+close|Audit|ביקורת|bikoret|
+close|Auditor|רואה חשבון מבקר|ro'e kheshbon mevaker|
+close|Accountant (CPA)|רואה חשבון;רו"ח|ro'e kheshbon|Abbreviated רו"ח
+close|Controller|חשב|khashav|Also just "קונטרולר"
+close|Bookkeeping|הנהלת חשבונות|hanhalat kheshbonot|
+close|VAT|מע"מ|ma'am|Short for מס ערך מוסף
+close|Income tax|מס הכנסה|mas hakhnasa|
+close|Withholding tax|ניכוי במקור|nikui ba-makor|
+close|Write-off|מחיקה|mekhika|
+close|Doubtful debts|חובות מסופקים|khovot mesupakim|The provision = הפרשה לחובות מסופקים
+close|To capitalise (costs)|להוון|lehaven|Same root as היוון (discounting)
+cash|Cash flow|תזרים מזומנים;תזרים|tazrim mezumanim|Usually just "תזרים"
+cash|Cash balance|יתרת מזומנים|yitrat mezumanim|
+cash|Balance|יתרה|yitra|
+cash|Invoice|חשבונית|kheshbonit|
+cash|Tax invoice|חשבונית מס|kheshbonit mas|
+cash|Receipt|קבלה|kabala|
+cash|Credit note|הודעת זיכוי;חשבונית זיכוי|hoda'at zikui|
+cash|Billing|חיוב;חיובים|khiyuv|
+cash|Collections|גבייה|gviya|
+cash|Receivables|לקוחות;חייבים|lekokhot|Trade receivables on the balance sheet
+cash|Payables|ספקים;זכאים|sapakim|Trade payables on the balance sheet
+cash|Supplier|ספק|sapak|
+cash|Payment|תשלום|tashlum|
+cash|Payment terms|תנאי תשלום|tna'ei tashlum|
+cash|Net 30 from month end|שוטף + 30;שוטף 30|shotef plus shloshim|The Israeli standard: end of month plus 30 days
+cash|Overdue|באיחור;בפיגור|be-ikhur|
+cash|Debt|חוב|khov|
+cash|Refund|החזר|hekhzer|
+cash|Bank transfer|העברה בנקאית|ha'avara banka'it|
+cash|Working capital|הון חוזר|hon khozer|
+cash|Debit|חובה|khova|
+cash|Credit|זכות|zkhut|
+cash|Purchase order|הזמנת רכש|hazmanat rekhesh|
+cash|Procurement|רכש|rekhesh|
+cash|Expense report|דוח הוצאות|do'akh hotsa'ot|
+people|Salary|שכר;משכורת|sakhar|משכורת = the monthly pay itself
+people|Payslip|תלוש שכר;תלוש|tlush sakhar|
+people|Employer cost|עלות מעסיק|alut ma'asik|Salary plus employer social costs
+people|Headcount|מצבת כוח אדם;מצבת עובדים|matsevet ko'akh adam|In meetings often "הדקאונט"
+people|Employee|עובד|oved|Plural: עובדים
+people|Open position|משרה פתוחה;תקן פתוח|misra ptukha|
+people|Hiring|גיוס|giyus|
+people|Hiring freeze|הקפאת גיוסים|hakpa'at giyusim|
+people|Termination|פיטורים;פיטורין|piturim|
+people|Resignation|התפטרות|hitpatrut|
+people|Notice period|הודעה מוקדמת|hoda'a mukdemet|
+people|Severance|פיצויים|pitsuyim|
+people|Pension|פנסיה|pensya|
+people|Study fund|קרן השתלמות|keren hishtalmut|Israeli tax-advantaged savings fund
+people|National Insurance|ביטוח לאומי|bitu'akh le'umi|
+people|Commission|עמלה|amla|Sales commission is often "קומישן"
+people|Bonus|בונוס;מענק|bonus|
+people|Stock options|אופציות|optsyot|
+people|Raise|העלאה;העלאת שכר|ha'ala'a|
+people|Department|מחלקה|makhlaka|
+people|Contractor|קבלן|kablan|
+people|Vacation days|ימי חופשה|yemei khufsha|
+people|Sick days|ימי מחלה|yemei makhala|
+channel|Distributor|מפיץ|mefits|
+channel|Reseller|משווק|meshavek|
+channel|Partner|שותף|shutaf|
+channel|Small and medium businesses|עסקים קטנים ובינוניים|asakim ktanim u-veinoniyim|
+channel|Market|שוק|shuk|
+channel|Competitor|מתחרה|mitkhare|
+channel|Region|אזור|ezor|
+channel|Deal|עסקה|iska|
+channel|Sales rep|איש מכירות|ish mekhirot|
+channel|Account manager|מנהל לקוח|menahel lako'akh|
+channel|Information security|אבטחת מידע|avtakhat meida|
+channel|Cyber attack|מתקפת סייבר|mitkefet saiber|
+channel|Product|מוצר|mutsar|
+channel|Module|מודול|modul|
+channel|Channel margin|מרווח|mirvakh|The margin left for the distributor or reseller
+verbs|To calculate|לחשב|lekhashev|
+verbs|To analyse|לנתח|lenate'akh|
+verbs|To check|לבדוק|livdok|
+verbs|To approve|לאשר|le'asher|
+verbs|To update|לעדכן|le'adken|
+verbs|To send|לשלוח|lishlo'akh|
+verbs|To present|להציג|lehatsig|
+verbs|To explain|להסביר|lehasbir|
+verbs|To compare|להשוות|lehashvot|
+verbs|To allocate|להקצות|lehaktsot|
+verbs|To reconcile|להתאים|lehat'im|
+verbs|To book (an entry)|לרשום|lirshom|
+verbs|To charge / bill|לחייב|lekhayev|
+verbs|To collect|לגבות|ligbot|
+verbs|To pay|לשלם|leshalem|
+verbs|To grow|לצמוח|litsmo'akh|
+verbs|To increase|להגדיל|lehagdil|Easy to confuse with להגדיר (to define)
+verbs|To define|להגדיר|lehagdir|
+verbs|To reduce|להקטין;לצמצם|lehaktin|
+verbs|To cut (costs)|לקצץ|lekatsets|
+verbs|To exceed|לחרוג|lakhrog|Overrun = חריגה
+verbs|To estimate|להעריך|leha'arikh|
+verbs|To exclude|לנטרל|lenatrel|"Excluding" = בנטרול
+verbs|To include|לכלול|likhlol|
+verbs|To close (the month)|לסגור|lisgor|
+verbs|To fix|לתקן|letaken|
+verbs|To verify|לוודא|levade|
+verbs|To clarify|להבהיר|lehavhir|
+verbs|To prioritise|לתעדף|leta'adef|
+verbs|To postpone|לדחות|lidkhot|
+verbs|To sign|לחתום|lakhtom|
+verbs|To renew|לחדש|lekhadesh|
+verbs|To cancel|לבטל|levatel|
+verbs|To issue (an invoice)|להוציא|lehotsi|
+verbs|To track|לעקוב|la'akov|
+verbs|To schedule a meeting|לקבוע פגישה|likbo'a pgisha|
+meet|Meeting|פגישה|pgisha|
+meet|Board meeting|ישיבת דירקטוריון|yeshivat direktoryon|
+meet|Presentation|מצגת|matseget|
+meet|File|קובץ|kovets|
+meet|Data|נתונים|netunim|
+meet|Source|מקור|makor|
+meet|Owner (responsible)|אחראי|akhra'i|
+meet|Deadline|מועד אחרון;דדליין|mo'ed akharon|In practice usually "דדליין"
+meet|By end of day|עד סוף היום|ad sof ha-yom|
+meet|By end of week|עד סוף השבוע|ad sof ha-shavua|
+meet|As of today|נכון להיום|nakhon le-hayom|
+meet|In line with budget|בהתאם לתקציב|be-hetem la-taktsiv|
+meet|Above budget|מעל התקציב|me'al ha-taktsiv|
+meet|Below budget|מתחת לתקציב|mitakhat la-taktsiv|
+meet|One-off|חד פעמי|khad pa'ami|
+meet|Approximately|בערך|be-erekh|Written shorthand: כ־ (כעשרה = about ten)
+meet|Thousand|אלף|elef|
+meet|Million|מיליון|milyon|
+meet|Percent|אחוז|akhuz|
+meet|Percentage point|נקודת אחוז|nekudat akhuz|
+meet|What's driving the gap?|ממה נובע הפער?|mi-ma nove'a ha-pa'ar|
+meet|Let's take it offline|נדבר על זה בנפרד|nedaber al ze be-nifrad|
+meet|I'll get back to you|אחזור אליך|akhzor elekha|
+meet|Makes sense|הגיוני|hegyoni|
+meet|Agreed|מוסכם|muskam|
+meet|Exactly|בדיוק|bediyuk|
+meet|I'm not sure|אני לא בטוח|ani lo batu'akh|
+meet|Good question|שאלה טובה|she'ela tova|
+meet|The numbers don't tie|המספרים לא מסתדרים|ha-misparim lo mistadrim|
+`;
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-const K1='hc5_srs',K2='hc5_st',K3='hc5_ss',K4='hc5_err';
-let srs={},st={ok:0,no:0,str:0,best:0},ssrs={},errs={};
-let mode='auto',sW=[],sIdx=0,sOk=0,sNo=0,ans=false,curW=null,curS=null,sessLen=20,screen='home';
-const E=id=>document.getElementById(id);
-function he1(w){return Array.isArray(w.he)?w.he[0]:w.he}
-function norm(t){return t.replace(/[\s\u200e\u200f]/g,'').replace(/[״"]/g,'"').replace(/^[הו]/,'')}
-function sh(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function ld(){try{let x;x=localStorage.getItem(K1);if(x)srs=JSON.parse(x);x=localStorage.getItem(K2);if(x)st=JSON.parse(x);x=localStorage.getItem(K3);if(x)ssrs=JSON.parse(x);x=localStorage.getItem(K4);if(x)errs=JSON.parse(x)}catch(e){}
-V.forEach(w=>{if(!srs[w.en])srs[w.en]={box:0,last:0,tc:0,tw:0,exp:0}});S.forEach((_,i)=>{if(!ssrs['s'+i])ssrs['s'+i]={box:0}})}
-function sv(){try{localStorage.setItem(K1,JSON.stringify(srs));localStorage.setItem(K2,JSON.stringify(st));localStorage.setItem(K3,JSON.stringify(ssrs));localStorage.setItem(K4,JSON.stringify(errs))}catch(e){}}
+// Format: English|Hebrew|transliteration
+const SENT_RAW = `
+The budget was approved|התקציב אושר.|ha-taktsiv ushar
+We need to update the forecast|צריך לעדכן את התחזית.|tsarikh le'adken et ha-takhazit
+Revenue grew 12% year over year|ההכנסות צמחו ב-12% לעומת שנה קודמת.|ha-hakhnasot tsamkhu bi-shteim-esre akhuz le'umat shana kodemet
+The gap comes from employer costs|הפער נובע מעלות מעסיק.|ha-pa'ar nove'a me-alut ma'asik
+It's a timing difference, not a real saving|זה הפרש עיתוי, לא חיסכון אמיתי.|ze hefresh itui, lo khisakhon amiti
+We closed the month on time|סגרנו את החודש בזמן.|sagarnu et ha-khodesh ba-zman
+Can you send me the file by end of day?|תוכל לשלוח לי את הקובץ עד סוף היום?|tukhal lishlo'akh li et ha-kovets ad sof ha-yom
+Operating expenses were above budget|הוצאות התפעול היו מעל התקציב.|hotsa'ot ha-tif'ul hayu me'al ha-taktsiv
+Excluding FX, we are in line with plan|בנטרול מט"ח, אנחנו בהתאם לתוכנית.|be-nitrul matakh, anakhnu be-hetem la-tokhnit
+ARR grew this quarter thanks to renewals|ה-ARR גדל ברבעון הזה בזכות חידושים.|ha-ARR gadal ba-riv'on ha-ze bizkhut khidushim
+Churn was higher than expected|הנטישה הייתה גבוהה מהצפוי.|ha-netisha hayta gvoha me-ha-tsafui
+The distributor hasn't paid yet|המפיץ עוד לא שילם.|ha-mefits od lo shilem
+The invoice wasn't paid on time|החשבונית לא שולמה בזמן.|ha-kheshbonit lo shulma ba-zman
+Collections improved this month|הגבייה השתפרה החודש.|ha-gviya hishtapra ha-khodesh
+We need to book an accrual for the bonus|צריך לרשום הפרשה לבונוס.|tsarikh lirshom hafrasha la-bonus
+I'll get back to you tomorrow|אחזור אליך מחר.|akhzor elekha makhar
+The numbers don't tie to the report|המספרים לא מסתדרים עם הדוח.|ha-misparim lo mistadrim im ha-do'akh
+Where does this number come from?|מאיפה המספר הזה מגיע?|me-eifo ha-mispar ha-ze magi'a
+Gross margin improved by two percentage points|שיעור הרווח הגולמי השתפר בשתי נקודות אחוז.|shi'ur ha-revakh ha-golmi hishtaper bi-shtei nekudot akhuz
+We froze hiring until the end of the quarter|הקפאנו גיוסים עד סוף הרבעון.|hikpenu giyusim ad sof ha-riv'on
+We have three fewer employees than plan|יש לנו שלושה עובדים פחות מהתוכנית.|yesh lanu shlosha ovdim pakhot me-ha-tokhnit
+The board meeting is next week|ישיבת הדירקטוריון בשבוע הבא.|yeshivat ha-direktoryon ba-shavua ha-ba
+I'll prepare the presentation|אני אכין את המצגת.|ani akhin et ha-matseget
+Who owns this?|מי אחראי על זה?|mi akhra'i al ze
+Payment terms are net 30 from month end|תנאי התשלום הם שוטף + 30.|tna'ei ha-tashlum hem shotef plus shloshim
+We need to issue a credit note|צריך להוציא הודעת זיכוי.|tsarikh lehotsi hoda'at zikui
+The customer asked for a discount|הלקוח ביקש הנחה.|ha-lako'akh bikesh hanakha
+The renewal was signed yesterday|החידוש נחתם אתמול.|ha-khidush nekhtam etmol
+This is a one-off expense|זו הוצאה חד פעמית.|zo hotsa'a khad pa'amit
+We are cutting marketing costs|אנחנו מקצצים בהוצאות השיווק.|anakhnu mekatsetsim be-hotsa'ot ha-shivuk
+The auditors asked for the reconciliation|רואי החשבון ביקשו את ההתאמה.|ro'ei ha-kheshbon bikshu et ha-hat'ama
+Cash balance is about ten million dollars|יתרת המזומנים היא כעשרה מיליון דולר.|yitrat ha-mezumanim hi ke-asara milyon dolar
+Do the numbers include VAT?|המספרים כוללים מע"מ?|ha-misparim kolelim ma'am
+Partner usage grew this month|הצריכה של השותפים גדלה החודש.|ha-tsrikha shel ha-shutafim gadla ha-khodesh
+As of today, we are above target|נכון להיום, אנחנו מעל היעד.|nakhon le-hayom, anakhnu me'al ha-ya'ad
+Bookings came in below forecast|ההזמנות היו מתחת לתחזית.|ha-hazmanot hayu mitakhat la-takhazit
+Makes sense, let's go with that|הגיוני, בוא נלך על זה.|hegyoni, bo nelekh al ze
+Please approve the purchase order|תאשר בבקשה את הזמנת הרכש.|ta'asher bevakasha et hazmanat ha-rekhesh
+Deferred revenue increased this quarter|ההכנסות מראש גדלו ברבעון.|ha-hakhnasot merosh gadlu ba-riv'on
+Which assumptions did you use?|באילו הנחות השתמשת?|be-eilu hanakhot hishtamashta
+I'll update the model and send it again|אעדכן את המודל ואשלח שוב.|a'adken et ha-model ve-eshlakh shuv
+We need to reconcile billings against the books|צריך להתאים את החיובים מול הנהלת החשבונות.|tsarikh lehat'im et ha-khiyuvim mul hanhalat ha-kheshbonot
+The price increase takes effect in January|העלאת המחיר נכנסת לתוקף בינואר.|ha'ala'at ha-mekhir nikhneset le-tokef be-yanuar
+Can we move the meeting to Thursday?|אפשר להזיז את הפגישה ליום חמישי?|efshar lehaziz et ha-pgisha le-yom khamishi
+The reseller asked for better terms|המשווק ביקש תנאים טובים יותר.|ha-meshavek bikesh tna'im tovim yoter
+`;
 
-// SRS timing
-function isDue(w){const s=srs[w.en];if(!s||s.box===0)return true;const iv=[0,3600000,21600000,86400000,259200000];return Date.now()-(s.last||0)>=(iv[s.box]||0)}
-function dueCount(){return V.filter(isDue).length}
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const V = VOCAB_RAW.trim().split('\n').map(l => {
+  const [c,en,he,tr,note] = l.split('|');
+  const alts = he.split(';');
+  return {id:slug(en), c, en, he:alts[0], alts, tr, note:note||''};
+});
+const SENT = SENT_RAW.trim().split('\n').map(l => {
+  const [en,he,tr] = l.split('|');
+  return {id:slug(en), en, he, tr};
+});
 
-// Auto-pick mode per word based on SRS box
-function autoMode(w){const b=(srs[w.en]||{}).box||0;const exp=(srs[w.en]||{}).exp||0;
-    // Brand new + hard word + never exposed → one exposure
-    if(b===0&&exp===0&&w.d>=3)return'expose';
-    // Box 0: mostly MC with occasional type for easy words
-    if(b===0)return w.d<=2?sh(['mc','mc','type'])[0]:'mc';
-    // Box 1: MC and type mix
-    if(b===1)return sh(['mc','type','type'])[0];
-    // Box 2: type-heavy with some cloze
-    if(b===2)return sh(['type','type','reverse'])[0];
-    // Box 3+: hardest modes
-    return sh(['type','reverse','audio'])[0]}
+// ─────────────────────────────────────────────────────────────
+// STATE (localStorage, per browser; export/import in Settings)
+// ─────────────────────────────────────────────────────────────
+const KEY = 'fpa-hebrew-v2';
+const DAY = 864e5;
+const MAX_REVIEWS = 30;          // review cap per session
+const SENT_PER_SESSION = 8;
+const SENT_INTERVALS = [0,1,3,7,14,30]; // days by box
+const KNOWN_DAYS = 21;           // interval at which a word counts as known
 
-// Build session
-function buildSess(n,filter){
-    let pool=filter||V.filter(isDue);if(pool.length<n)pool=pool.concat(V.filter(w=>!isDue(w)));
-    const wt=[16,8,4,2,1];let wp=[];pool.forEach(w=>{for(let i=0;i<(wt[(srs[w.en]||{}).box||0]||1);i++)wp.push(w)});
-    sh(wp);let seen=new Set,r=[];for(const w of wp)if(!seen.has(w.en)&&r.length<n){seen.add(w.en);r.push(w)}
-    return sh(r)}
-function buildSentSess(n){
-    const wt=[8,4,2,1,1];let wp=[];S.forEach((s,i)=>{for(let j=0;j<(wt[(ssrs['s'+i]||{}).box||0]||1);j++)wp.push({...s,_i:i})});
-    sh(wp);let seen=new Set,r=[];for(const s of wp)if(!seen.has(s._i)&&r.length<n){seen.add(s._i);r.push(s)}return sh(r)}
+const DEFAULTS = {
+  newPerDay:10, focus:'all', typing:true,
+  kbd:!window.matchMedia('(pointer: coarse)').matches,
+  translit:false, autoplay:true, rate:0.9
+};
 
-function recOk(w){st.ok++;st.str++;if(st.str>st.best)st.best=st.str;sOk++;if(w){const s=srs[w.en];s.box=Math.min(4,s.box+1);s.tc++;s.last=Date.now()}sv();checkCeleb()}
-function recNo(w){st.no++;st.str=0;sNo++;if(w){const s=srs[w.en];s.box=0;s.tw++;s.last=Date.now()}sv()}
+function load(){
+  try{
+    const x = JSON.parse(localStorage.getItem(KEY));
+    if(x && x.cards) return {cards:x.cards, sent:x.sent||{}, days:x.days||{}, newLog:x.newLog||{}, set:{...DEFAULTS, ...(x.set||{})}};
+  }catch(e){}
+  return {cards:{}, sent:{}, days:{}, newLog:{}, set:{...DEFAULTS}};
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 
-function speakHe(text){if(!text)return;if(speechSynthesis.speaking)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='he-IL';const v=speechSynthesis.getVoices().find(v=>v.lang.includes('he'));if(v)u.voice=v;speechSynthesis.speak(u)}
+const dkey = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today = () => dkey(new Date());
+function startOfToday(){ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); }
+const endOfToday = () => startOfToday()+DAY;
 
-// ═══════════════════════════════════════
-// CELEBRATION (#4)
-// ═══════════════════════════════════════
-function checkCeleb(){
-    if(st.str===5)celebrate('🔥 5 Streak!','var(--or)');
-    else if(st.str===10)celebrate('⚡ 10 Streak!','var(--ac)');
-    else if(st.str===20)celebrate('🏆 20 Streak!','var(--gn)');
-    else if(st.str===50)celebrate('💎 50 Streak!','var(--pr)')}
-function celebrate(text,color){
-    const c=E('celeb');c.innerHTML=`<div class="celeb-text" style="color:${color}">${text}</div>`;
-    for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';
-    p.style.cssText=`left:50%;top:50%;background:${color};--dx:${(Math.random()-.5)*300}px;--dy:${(Math.random()-.5)*300}px;animation-delay:${Math.random()*.3}s`;
-    c.appendChild(p)}c.classList.add('show');setTimeout(()=>{c.classList.remove('show');c.innerHTML=''},1200)}
+// Keep only today's new-word count
+Object.keys(S.newLog).forEach(k => { if(k!==today()) delete S.newLog[k]; });
 
-// ═══════════════════════════════════════
-// SCREENS
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const pick = a => a[Math.floor(Math.random()*a.length)];
 
-function goHome(){E('ov').classList.remove('show');screen='home';renderHome()}
+// Hebrew answer matching: ignore niqqud, punctuation, spaces, final-letter forms and a leading ה.
+const FINALS = {'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'};
+function normHe(s){
+  s = (s||'').replace(/[\u0591-\u05C7]/g,'').replace(/[\s"'״׳`.,?!:;()\-–—+]/g,'');
+  s = s.replace(/[ךםןףץ]/g, c => FINALS[c]);
+  if(s.length>2 && s[0]==='ה') s = s.slice(1);
+  return s;
+}
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){
+    const cur=[i];
+    for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[n];
+}
+// 'exact' | 'close' (one letter off, accepted) | 'wrong'
+function matchHe(input, w){
+  const n = normHe(input); if(!n) return 'wrong';
+  const targets = w.alts.map(normHe);
+  if(targets.includes(n)) return 'exact';
+  if(targets.some(t => t.length>=4 && lev(n,t)<=1)) return 'close';
+  return 'wrong';
+}
+
+// ─────────────────────────────────────────────────────────────
+// SPEECH (browser text-to-speech; needs a Hebrew voice on the device)
+// ─────────────────────────────────────────────────────────────
+let heVoice = null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  heVoice = vs.find(v => /^(he|iw)/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = () => { const had=!!heVoice; loadVoices(); if(!had && heVoice && (view==='home'||view==='settings')) render(); };
+}
+function speak(text){
+  if(!heVoice || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = heVoice; u.lang = heVoice.lang; u.rate = S.set.rate;
+  speechSynthesis.speak(u);
+}
+const ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const playBtn = (t, big) => heVoice ? `<button class="play${big?' big':''}" data-a="say" data-t="${esc(t)}" aria-label="Play audio">${ICON}</button>` : '';
+
+// ─────────────────────────────────────────────────────────────
+// SCHEDULING (simplified SM-2: intervals grow with each correct recall)
+// ─────────────────────────────────────────────────────────────
+const card = id => S.cards[id];
+function dueWords(){
+  const end = endOfToday();
+  return V.filter(w => card(w.id) && card(w.id).due < end).sort((a,b) => card(a.id).due - card(b.id).due);
+}
+function newAvailable(){
+  const left = Math.max(0, S.set.newPerDay - (S.newLog[today()]||0));
+  return V.filter(w => !card(w.id) && (S.set.focus==='all' || w.c===S.set.focus)).slice(0, left);
+}
+function schedule(id, ok, wasMissed){
+  const c = S.cards[id] || (S.cards[id] = {ivl:0, ease:2.5, reps:0, lapses:0, due:0});
+  if(ok){
+    if(wasMissed){ c.ivl = 1; }
+    else{
+      c.ivl = c.reps===0 ? 1 : c.reps===1 ? 3 : Math.max(c.ivl+1, Math.round(c.ivl*c.ease));
+      c.reps++; c.ease = Math.min(3, c.ease+0.05);
+    }
+    c.due = startOfToday() + c.ivl*DAY;
+  } else if(!wasMissed){
+    if(c.reps>0) c.lapses++;
+    c.ease = Math.max(1.3, c.ease-0.2); c.reps = 0; c.ivl = 0; c.due = 0;
+  }
+}
+function counts(filter){
+  let known=0, learning=0, total=0;
+  V.forEach(w => {
+    if(filter && w.c!==filter) return;
+    total++;
+    const c = card(w.id); if(!c) return;
+    if(c.ivl>=KNOWN_DAYS) known++; else learning++;
+  });
+  return {known, learning, total};
+}
+function logDay(ok){
+  const d = S.days[today()] || (S.days[today()] = {n:0, ok:0});
+  d.n++; if(ok) d.ok++;
+}
+function streak(){
+  const d = new Date();
+  if(!S.days[dkey(d)]) d.setDate(d.getDate()-1);
+  let n = 0;
+  while(S.days[dkey(d)] && S.days[dkey(d)].n>0){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+
+// Distractors: same area first so the choice is a real test, never the same Hebrew word
+function distract(w, n=3){
+  const okx = x => x.id!==w.id && x.he!==w.he && !w.alts.includes(x.he) && x.en!==w.en;
+  const same = shuffle(V.filter(x => okx(x) && x.c===w.c));
+  const other = shuffle(V.filter(x => okx(x) && x.c!==w.c));
+  const out = [];
+  for(const x of [...same, ...other]){
+    if(out.length>=n) break;
+    if(!out.some(o => o.he===x.he || o.en===x.en)) out.push(x);
+  }
+  return out;
+}
+function pickType(w){
+  const r = (card(w.id)||{}).reps || 0;
+  const listen = heVoice ? 'listen' : 'recall';
+  if(r<1) return 'rec';
+  if(r<2) return pick(['rec','recall']);
+  if(r<4) return pick(['recall','recall',listen]);
+  return pick([S.set.typing?'type':'recall', listen, 'recall']);
+}
+
+// ─────────────────────────────────────────────────────────────
+// VIEWS
+// ─────────────────────────────────────────────────────────────
+let view = 'home', sess = null;
+
+function render(){
+  if(view==='home') renderHome();
+  else if(view==='words') renderWords();
+  else if(view==='settings') renderSettings();
+  else if(view==='session') renderSession();
+  window.scrollTo(0,0);
+}
+
+const topBar = () => `<header class="top"><div class="brand">FP&amp;A Hebrew</div><nav class="nav"><button class="link" data-a="words">Words</button><button class="link" data-a="settings">Settings</button></nav></header>`;
+const subBar = t => `<header class="top"><div class="brand">${t}</div><button class="link" data-a="home">Done</button></header>`;
 
 function renderHome(){
-    screen='home';const due=dueCount();const mas=V.filter(w=>(srs[w.en]||{}).box>=4).length;
-    const total=st.ok+st.no;const acc=total>0?Math.round(st.ok/total*100):100;
-    const pct=Math.round(mas/V.length*100);const circ=2*Math.PI*13;const off=circ-(pct/100*circ);
-    
-    E('app').innerHTML=`
-    <div class="hdr">
-        <div class="hdr-l"><div class="logo">א</div><div class="hdr-t">FP&A Hebrew</div></div>
-        <div class="hdr-r">
-            <div class="ring-wrap" onclick="openPanel()" title="Dashboard">
-                <svg class="ring-svg" viewBox="0 0 32 32"><circle class="ring-bg" cx="16" cy="16" r="13"/><circle class="ring-fg" cx="16" cy="16" r="13" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/></svg>
-                <div class="ring-text">${pct}%</div>
-            </div>
-            <div class="hdr-btn" onclick="openPanel()" title="Stats">📊</div>
-            <div class="hdr-btn" onclick="resetAll()" title="Reset">↺</div>
-        </div>
+  const due = dueWords().length, fresh = newAvailable().length, cnt = counts();
+  const learned = cnt.known + cnt.learning;
+  const date = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+  let head, sub;
+  if(due+fresh===0){ head = 'All caught up'; sub = 'Nothing due today. Practise anyway or work on sentences.'; }
+  else{
+    head = due ? `${due} ${due===1?'review':'reviews'} due` : `${fresh} new ${fresh===1?'word':'words'}`;
+    sub = due && fresh ? `Plus ${fresh} new ${fresh===1?'word':'words'} to learn` : due ? 'No new words left for today' : 'Ready to learn';
+  }
+  const rows = Object.keys(CATS).map(k => {
+    const c = counts(k);
+    const kp = c.total ? c.known/c.total*100 : 0, lp = c.total ? c.learning/c.total*100 : 0;
+    return `<div class="cat"><div>${CATS[k]}</div><div class="cat-n">${c.known} / ${c.total}</div><div class="bar"><i style="width:${kp}%"></i><i class="l" style="width:${lp}%"></i></div></div>`;
+  }).join('');
+  app.innerHTML = `${topBar()}
+    <div class="date">${date}</div>
+    <h1 class="headline">${head}</h1>
+    <div class="sub">${sub}</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v">${cnt.known}</div><div class="stat-l">Known</div></div>
+      <div class="stat"><div class="stat-v">${cnt.learning}</div><div class="stat-l">Learning</div></div>
+      <div class="stat"><div class="stat-v">${streak()}</div><div class="stat-l">Day streak</div></div>
     </div>
-    <div class="top-stats">
-        <div class="ts"><div class="ts-v" style="color:var(--gn)">${st.ok}</div><div class="ts-l">Correct</div></div>
-        <div class="ts"><div class="ts-v" style="color:var(--rd)">${st.no}</div><div class="ts-l">Wrong</div></div>
-        <div class="ts"><div class="ts-v" style="color:var(--ac)">${acc}%</div><div class="ts-l">Accuracy</div></div>
-        <div class="ts"><div class="ts-v flame"><span class="flame-icon ${st.str>=5?'hot':''}">${st.str>=5?'🔥':'⚡'}</span>${st.str}</div><div class="ts-l">Streak</div></div>
+    ${due+fresh>0
+      ? `<button class="btn btn-p" data-a="start">Start review</button>`
+      : `<button class="btn btn-p" data-a="cram" ${learned<4?'disabled':''}>Practise anyway</button>`}
+    <button class="btn btn-s" data-a="sent">Practise sentences</button>
+    <section class="section"><h2 class="section-t">Progress by area</h2>${rows}</section>
+    <div class="foot">${V.length} words and ${SENT.length} sentences. Known means you've recalled it at a gap of three weeks or more.</div>`;
+}
+
+// ── Sessions ────────────────────────────────────────────────
+function newSess(kind, q, cram){
+  return {kind, q, i:0, n:0, ok:0, newN:0, missed:new Set(), tries:{}, cram:!!cram, answered:false, cur:null, timer:null};
+}
+function startReview(){
+  const R = shuffle(dueWords().slice(0, MAX_REVIEWS));
+  const N = newAvailable();
+  const q = []; let r=0, n=0;
+  // Two reviews, then one new word, repeated
+  while(r<R.length || n<N.length){
+    for(let k=0; k<2 && r<R.length; k++) q.push({w:R[r++], t:'test'});
+    if(n<N.length) q.push({w:N[n++], t:'intro'});
+  }
+  sess = newSess('words', q); view='session'; render();
+}
+function startCram(){
+  const pool = shuffle(V.filter(w => card(w.id))).slice(0,15);
+  if(!pool.length) return;
+  sess = newSess('words', pool.map(w => ({w, t:'test'})), true); view='session'; render();
+}
+function startSentences(){
+  const end = endOfToday();
+  const due = shuffle(SENT.filter(s => S.sent[s.id] && S.sent[s.id].due < end));
+  const unseen = SENT.filter(s => !S.sent[s.id]);
+  let list = [...due, ...unseen].slice(0, SENT_PER_SESSION);
+  if(list.length < SENT_PER_SESSION) list = list.concat(shuffle(SENT.filter(s => !list.includes(s))).slice(0, SENT_PER_SESSION-list.length));
+  const q = list.map(s => ({s, t: heVoice && S.sent[s.id] && S.sent[s.id].box>=2 && Math.random()<.5 ? 'hear' : 'build'}));
+  sess = newSess('sent', q); view='session'; render();
+}
+
+function renderSession(){
+  clearTimeout(sess.timer);
+  if(sess.i >= sess.q.length){ finish(); return; }
+  sess.answered = false;
+  const it = sess.q[sess.i];
+  const pct = Math.round(sess.i/sess.q.length*100);
+  const head = `<div class="sess-top"><button class="link quiet" data-a="end">Close</button><div class="prog"><i style="width:${pct}%"></i></div><div class="count">${sess.i+1} / ${sess.q.length}</div></div>`;
+  let body;
+  if(sess.kind==='sent') body = sentBody(it);
+  else if(it.t==='intro') body = introBody(it.w);
+  else body = testBody(it.w);
+  app.innerHTML = head + `<div class="stage">${body}</div>`;
+
+  // After render: audio and focus
+  const cur = sess.cur, t = cur.type, say = cur.w ? cur.w.he : cur.s.he;
+  if(t==='listen' || t==='hear' || (t==='intro' && S.set.autoplay)) setTimeout(() => speak(say), 150);
+  if(t==='type'){ const a=$('#ans'); if(a) a.focus({preventScroll:true}); }
+  if(sess.kind==='sent') drawTiles();
+}
+
+function introBody(w){
+  sess.cur = {w, type:'intro'};
+  const also = w.alts.length>1 ? `<div class="note">Also <span class="he">${w.alts.slice(1).map(esc).join(', ')}</span></div>` : '';
+  return `<div class="ask">New word in ${CATS[w.c]}</div>
+    <div class="p-he he">${esc(w.he)}</div>
+    <div class="tr">${esc(w.tr)}</div>
+    <div class="p-gloss">${esc(w.en)}</div>
+    ${also}
+    ${w.note ? `<div class="note">${esc(w.note)}</div>` : ''}
+    ${playBtn(w.he)}
+    <div class="fb"><button class="btn btn-p" data-a="intro">Continue</button></div>`;
+}
+
+function testBody(w){
+  const type = pickType(w);
+  const cur = sess.cur = {w, type};
+  const optsHtml = field => `<div class="opts">${cur.opts.map((o,i) =>
+    `<button class="opt" data-a="opt" data-i="${i}"><span class="k">${i+1}</span><span class="t${field==='he'?' he':''}">${esc(o[field])}</span></button>`).join('')}</div>`;
+  if(type==='rec' || type==='listen' || type==='recall') cur.opts = shuffle([w, ...distract(w)]);
+
+  if(type==='rec') return `<div class="ask">What does this mean?</div>
+    <div class="p-he he">${esc(w.he)}</div>
+    ${S.set.translit ? `<div class="tr">${esc(w.tr)}</div>` : ''}
+    ${playBtn(w.he)}${optsHtml('en')}<div class="fb" id="fb"></div>`;
+  if(type==='listen') return `<div class="ask">Listen and choose the meaning</div>
+    ${playBtn(w.he, true)}${optsHtml('en')}<div class="fb" id="fb"></div>`;
+  if(type==='recall') return `<div class="ask">How do you say it in Hebrew?</div>
+    <div class="p-en">${esc(w.en)}</div>${optsHtml('he')}<div class="fb" id="fb"></div>`;
+  // type
+  return `<div class="ask">Type it in Hebrew</div>
+    <div class="p-en">${esc(w.en)}</div>
+    <input class="ans he" id="ans" lang="he" dir="rtl" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Your answer in Hebrew">
+    ${S.set.kbd ? kbdHtml() : ''}
+    <div class="row-btns" id="btns"><button class="btn btn-s" data-a="dunno">Show answer</button><button class="btn btn-p" data-a="check">Check</button></div>
+    <div class="fb" id="fb"></div>`;
+}
+
+// Standard Israeli keyboard layout, left to right as on the physical keys
+const KB = [['ק','ר','א','ט','ו','ן','ם','פ'],['ש','ד','ג','כ','ע','י','ח','ל','ך','ף'],['ז','ס','ב','ה','נ','מ','צ','ת','ץ']];
+function kbdHtml(){
+  return `<div class="kb">${KB.map(r => `<div class="kb-row">${r.map(k => `<button data-a="key" data-k="${k}" tabindex="-1">${k}</button>`).join('')}</div>`).join('')}
+    <div class="kb-row"><button class="wide" data-a="key" data-k="&quot;" tabindex="-1">״</button><button class="wide" data-a="key" data-k=" " tabindex="-1">Space</button><button class="wide" data-a="key" data-k="DEL" tabindex="-1">Delete</button></div></div>`;
+}
+
+function pickOpt(i){
+  if(sess.answered || !sess.cur.opts) return;
+  const c = sess.cur, o = c.opts[i]; if(!o) return;
+  const ok = o.id===c.w.id;
+  document.querySelectorAll('.opt').forEach((b,j) => {
+    b.disabled = true;
+    if(c.opts[j].id===c.w.id) b.classList.add('ok');
+    else if(j===i) b.classList.add('bad');
+    else b.classList.add('dim');
+  });
+  answerWord(ok, ok ? null : o, false);
+}
+function checkType(giveUp){
+  if(sess.answered) return;
+  const inp = $('#ans'); if(!inp) return;
+  if(!giveUp && !inp.value.trim()) return;
+  const r = giveUp ? 'wrong' : matchHe(inp.value, sess.cur.w);
+  inp.disabled = true; inp.classList.add(r==='wrong' ? 'bad' : 'ok');
+  const b = $('#btns'); if(b) b.remove();
+  const kb = document.querySelector('.kb'); if(kb) kb.remove();
+  answerWord(r!=='wrong', null, r==='close');
+}
+
+function answerWord(ok, picked, close){
+  sess.answered = true; sess.n++; if(ok) sess.ok++;
+  const w = sess.cur.w, type = sess.cur.type;
+  logDay(ok);
+  const wasMissed = sess.missed.has(w.id);
+  if(!sess.cram) schedule(w.id, ok, wasMissed);
+  if(!ok){
+    sess.missed.add(w.id);
+    const t = (sess.tries[w.id]||0) + 1; sess.tries[w.id] = t;
+    // Bring it back three cards later, up to three times
+    if(t<=3) sess.q.splice(Math.min(sess.q.length, sess.i+4), 0, {w, t:'test'});
+  }
+  save();
+
+  const also = w.alts.length>1 ? `<div class="fb-note">Also <span class="he">${w.alts.slice(1).map(esc).join(', ')}</span></div>` : '';
+  $('#fb').innerHTML = `<div class="fb-card">
+    <div class="fb-status ${ok?'ok':'bad'}">${ok ? (close ? 'Accepted, but check the spelling' : 'Correct') : 'Not quite'}</div>
+    <div class="fb-line"><div><div class="fb-en">${esc(w.en)}</div><div class="fb-tr">${esc(w.tr)}</div></div><div class="fb-he he">${esc(w.he)}</div></div>
+    ${also}
+    ${w.note ? `<div class="fb-note">${esc(w.note)}</div>` : ''}
+    ${picked ? `<div class="fb-note">You chose <span class="he">${esc(picked.he)}</span>, which means ${esc(picked.en.toLowerCase())}</div>` : ''}
+    <div class="fb-bottom">${playBtn(w.he)}<button class="btn btn-p" data-a="next">Continue</button></div></div>`;
+
+  if(S.set.autoplay && type!=='listen') speak(w.he);
+  // Correct multiple-choice answers move on by themselves
+  if(ok && !close && type!=='type') sess.timer = setTimeout(next, 1300);
+}
+
+function introDone(){
+  const w = sess.cur.w;
+  if(!S.cards[w.id]){
+    S.cards[w.id] = {ivl:0, ease:2.5, reps:0, lapses:0, due:0};
+    S.newLog[today()] = (S.newLog[today()]||0) + 1;
+    sess.newN++;
+    save();
+  }
+  sess.q.splice(Math.min(sess.q.length, sess.i+4), 0, {w, t:'test'});
+  next();
+}
+function next(){ clearTimeout(sess.timer); if(window.speechSynthesis) speechSynthesis.cancel(); sess.i++; renderSession(); }
+
+// ── Sentences ───────────────────────────────────────────────
+const tokens = he => he.split(/\s+/).map(t => t.replace(/[.,?!:]/g,'')).filter(Boolean);
+function sentBody(it){
+  const s = it.s, target = tokens(s.he);
+  const pool = shuffle([...new Set(SENT.filter(x => x.id!==s.id).flatMap(x => tokens(x.he)))].filter(t => !target.includes(t)));
+  sess.cur = {s, type:it.t, target, bank:shuffle([...target, ...pool.slice(0,2)]), placed:[]};
+  const prompt = it.t==='hear'
+    ? `<div class="ask">Build what you hear</div>${playBtn(s.he, true)}`
+    : `<div class="ask">Build this in Hebrew</div><div class="p-en small">${esc(s.en)}</div>`;
+  return `${prompt}
+    <div class="build he" id="build" aria-label="Your sentence"></div>
+    <div class="bank" id="bank"></div>
+    <div class="row-btns" id="btns"><button class="btn btn-s" data-a="dunno">Show answer</button><button class="btn btn-p" data-a="check">Check</button></div>
+    <div class="fb" id="fb"></div>`;
+}
+function drawTiles(marks){
+  const c = sess.cur, dis = sess.answered ? ' disabled' : '';
+  $('#build').innerHTML = c.placed.map((bi,j) =>
+    `<button class="tile${marks ? (marks[j] ? ' ok' : ' bad') : ''}" data-a="untile" data-i="${j}"${dis}>${esc(c.bank[bi])}</button>`).join('');
+  $('#bank').innerHTML = c.bank.map((t,i) =>
+    `<button class="tile${c.placed.includes(i) ? ' used' : ''}" data-a="tile" data-i="${i}"${dis}>${esc(t)}</button>`).join('');
+}
+function checkSent(giveUp){
+  const c = sess.cur;
+  if(sess.answered) return;
+  if(!giveUp && !c.placed.length) return;
+  const built = c.placed.map(i => c.bank[i]);
+  const ok = !giveUp && built.join(' ')===c.target.join(' ');
+  sess.answered = true; sess.n++; if(ok) sess.ok++;
+  logDay(ok);
+  drawTiles(built.map((t,k) => t===c.target[k]));
+  const b = $('#btns'); if(b) b.remove();
+
+  const id = c.s.id, r = S.sent[id] || {box:0, due:0};
+  if(ok){
+    if(!sess.missed.has(id)) r.box = Math.min(5, r.box+1);
+    r.due = startOfToday() + Math.max(1, SENT_INTERVALS[r.box])*DAY;
+  } else {
+    r.box = Math.max(0, r.box-1); r.due = 0;
+    if(!sess.missed.has(id)){ sess.missed.add(id); sess.q.push({s:c.s, t:'build'}); }
+  }
+  S.sent[id] = r; save();
+
+  $('#fb').innerHTML = `<div class="fb-card">
+    <div class="fb-status ${ok?'ok':'bad'}">${ok ? 'Correct' : giveUp ? 'Answer' : 'Not quite'}</div>
+    <div class="fb-sent he">${esc(c.s.he)}</div>
+    <div class="fb-tr">${esc(c.s.tr)}</div>
+    <div class="fb-note">${esc(c.s.en)}</div>
+    <div class="fb-bottom">${playBtn(c.s.he)}<button class="btn btn-p" data-a="next">Continue</button></div></div>`;
+  if(S.set.autoplay && c.type!=='hear') speak(c.s.he);
+}
+
+function finish(){
+  clearTimeout(sess.timer);
+  view = 'summary';
+  const acc = sess.n ? Math.round(sess.ok/sess.n*100) : 0;
+  const tEnd = endOfToday();
+  const tomorrow = Object.values(S.cards).filter(c => c.due>=tEnd && c.due<tEnd+DAY).length;
+  const third = sess.kind==='sent'
+    ? `<div class="stat"><div class="stat-v">${sess.ok}</div><div class="stat-l">Built correctly</div></div>`
+    : `<div class="stat"><div class="stat-v">${sess.newN}</div><div class="stat-l">New words</div></div>`;
+  app.innerHTML = `<header class="top"><div class="brand">FP&amp;A Hebrew</div></header>
+    <div class="date">Session complete</div>
+    <h1 class="headline">${acc}% correct</h1>
+    <div class="sub">${tomorrow ? `${tomorrow} ${tomorrow===1?'word':'words'} due tomorrow` : 'Nothing scheduled for tomorrow yet'}</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v">${sess.n}</div><div class="stat-l">Answered</div></div>
+      ${third}
+      <div class="stat"><div class="stat-v">${streak()}</div><div class="stat-l">Day streak</div></div>
     </div>
-    <div class="home">
-        ${due>0?`<div class="due-banner" onclick="startDueReview()"><div class="due-num">${due}</div><div class="due-txt"><div class="due-title">words due for review</div><div class="due-sub">SRS says it's time to practice these</div></div><div class="due-go">Start →</div></div>`:''}
-        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Start a Session</div>
-        <div class="sess-pick">
-            <div class="sp-btn ${sessLen===10?'on':''}" onclick="sessLen=10;renderHome()"><span class="sp-n">10</span>Quick</div>
-            <div class="sp-btn ${sessLen===20?'on':''}" onclick="sessLen=20;renderHome()"><span class="sp-n">20</span>Standard</div>
-            <div class="sp-btn ${sessLen===30?'on':''}" onclick="sessLen=30;renderHome()"><span class="sp-n">30</span>Deep</div>
-            <div class="sp-btn ${sessLen===999?'on':''}" onclick="sessLen=999;renderHome()"><span class="sp-n">∞</span>Endless</div>
-        </div>
-        <button class="btn btn-p btn-full" onclick="startAuto()" style="padding:16px;font-size:16px">🚀 Auto Practice</button>
-        <div style="display:flex;gap:6px;margin-top:4px">
-            <button class="btn btn-s" style="flex:1" onclick="startManual('sentences')">💬 Sentences</button>
-            <button class="btn btn-s" style="flex:1" onclick="startManual('confuse')">⚡ Confused Pairs</button>
-        </div>
-        <div style="margin-top:8px">
-            <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;display:flex;justify-content:space-between;cursor:pointer" onclick="document.getElementById('adv-home').style.display=document.getElementById('adv-home').style.display==='none'?'flex':'none'">
-                <span>Advanced Modes</span><span>▾</span></div>
-            <div id="adv-home" style="display:none;flex-wrap:wrap;gap:6px">
-                <button class="btn btn-s btn-sm" onclick="startManual('mc')">🎯 Choose</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('type')">✏️ Type</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('cloze')">🧩 Fill Blank</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('reorder')">🔀 Reorder</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('audio')">🔊 Listen</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('reverse')">🔄 Reverse</button>
-                <button class="btn btn-s btn-sm" onclick="startManual('learn')">📖 Learn</button>
-            </div>
-        </div>
-    </div>`}
+    <button class="btn btn-p" data-a="home">Done</button>`;
+  sess = null;
+}
 
-// ═══════════════════════════════════════
-// SESSION
-// ═══════════════════════════════════════
-function startAuto(){mode='auto';sW=buildSess(Math.min(sessLen,V.length));sIdx=0;sOk=0;sNo=0;screen='play';renderPlay()}
-function startDueReview(){mode='auto';sW=buildSess(Math.min(sessLen,V.length),V.filter(isDue));sIdx=0;sOk=0;sNo=0;screen='play';renderPlay()}
-function startManual(m){
-    mode=m;sIdx=0;sOk=0;sNo=0;screen='play';
-    if(m==='sentences'||m==='cloze'||m==='reorder'){sW=buildSentSess(Math.min(sessLen,S.length))}
-    else if(m==='confuse'){startConfuseDrill();return}
-    else{sW=buildSess(Math.min(sessLen,V.length))}
-    renderPlay()}
+// ── Words ───────────────────────────────────────────────────
+function renderWords(){
+  app.innerHTML = `${subBar('Words')}
+    <input class="field" id="q" type="search" placeholder="Search English, Hebrew or transliteration" autocomplete="off">
+    <select class="field" id="wcat"><option value="all">All areas</option>${Object.keys(CATS).map(k => `<option value="${k}">${CATS[k]}</option>`).join('')}</select>
+    <div class="legend"><span><i class="dot"></i>New</span><span><i class="dot l"></i>Learning</span><span><i class="dot k"></i>Known</span></div>
+    <div class="meta" id="wmeta"></div><div id="wlist"></div>`;
+  $('#q').addEventListener('input', drawWords);
+  $('#wcat').addEventListener('change', drawWords);
+  drawWords();
+}
+function drawWords(){
+  const q = ($('#q').value||'').trim().toLowerCase(), cat = $('#wcat').value, nq = normHe(q);
+  const list = V.filter(w => (cat==='all' || w.c===cat) && (!q ||
+    w.en.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q) || (nq && w.alts.some(a => normHe(a).includes(nq)))));
+  $('#wmeta').textContent = `${list.length} ${list.length===1?'word':'words'}${heVoice ? '. Tap a word to hear it.' : ''}`;
+  $('#wlist').innerHTML = list.map(w => {
+    const c = card(w.id), st = !c ? '' : c.ivl>=KNOWN_DAYS ? ' k' : ' l';
+    return `<button class="w" data-a="say" data-t="${esc(w.he)}"><i class="dot${st}"></i><div><div class="w-en">${esc(w.en)}</div><div class="w-tr">${esc(w.tr)}</div></div><div class="w-he he">${esc(w.he)}</div></button>`;
+  }).join('');
+}
 
-function startConfuseDrill(){
-    // Build session from confused pair words
-    const cp=getConfPairs();const words=[];
-    cp.forEach(([h1,h2,e1,e2])=>{const w1=V.find(v=>v.en===e1);const w2=V.find(v=>v.en===e2);if(w1)words.push(w1);if(w2)words.push(w2)});
-    if(words.length<2){const allConf=CONF.flatMap(([,,e1,e2])=>[V.find(v=>v.en===e1),V.find(v=>v.en===e2)]).filter(Boolean);sW=sh([...allConf]).slice(0,Math.min(sessLen,allConf.length))}
-    else{sW=sh([...words]).slice(0,Math.min(sessLen,words.length))}
-    mode='type';sIdx=0;sOk=0;sNo=0;screen='play';renderPlay()}
+// ── Settings ────────────────────────────────────────────────
+function renderSettings(){
+  const seg = (k, opts) => `<div class="seg">${opts.map(([v,l]) => `<button class="${S.set[k]===v?'on':''}" data-a="seg" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
+  const sw = k => `<label class="sw"><input type="checkbox" data-set="${k}" ${S.set[k]?'checked':''}><span></span></label>`;
+  app.innerHTML = `${subBar('Settings')}
+    <div class="set"><div>New words per day</div>${seg('newPerDay', [[0,'0'],[5,'5'],[10,'10'],[15,'15'],[20,'20']])}</div>
+    <div class="set"><div>New words from</div><select data-set="focus"><option value="all">All areas</option>${Object.keys(CATS).map(k => `<option value="${k}" ${S.set.focus===k?'selected':''}>${CATS[k]}</option>`).join('')}</select></div>
+    <div class="set"><div><div>Typed answers</div><div class="set-d">For words you already know well</div></div>${sw('typing')}</div>
+    <div class="set"><div><div>On-screen Hebrew keyboard</div><div class="set-d">For computers without a Hebrew layout</div></div>${sw('kbd')}</div>
+    <div class="set"><div><div>Transliteration in questions</div><div class="set-d">Off makes you read the Hebrew</div></div>${sw('translit')}</div>
+    <div class="set"><div>Play audio automatically</div>${sw('autoplay')}</div>
+    <div class="set"><div>Speech speed</div>${seg('rate', [[0.7,'Slow'],[0.9,'Normal'],[1,'Fast']])}</div>
+    <div class="set"><div>Hebrew voice</div><div class="set-d">${heVoice ? esc(heVoice.name) : 'None on this device'}</div></div>
+    <section class="section"><h2 class="section-t">Progress</h2>
+      <div class="set"><div><div>Export progress</div><div class="set-d">Saved in this browser only</div></div><button class="link" data-a="export">Export</button></div>
+      <div class="set"><div>Import progress</div><button class="link" data-a="import">Import</button></div>
+      <div class="set"><div>Reset all progress</div><button class="link danger" data-a="reset">Reset</button></div>
+    </section>`;
+}
 
-function drillConfusables(){closePanel();startConfuseDrill()}
+// ─────────────────────────────────────────────────────────────
+// EVENTS
+// ─────────────────────────────────────────────────────────────
+function replay(){
+  if(!sess || !sess.cur) return;
+  speak(sess.cur.w ? sess.cur.w.he : sess.cur.s.he);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if(!b || b.disabled) return;
+  const a = b.dataset.a;
+  if(a!=='key') b.blur();
+  switch(a){
+    case 'home': view='home'; render(); break;
+    case 'words': view='words'; render(); break;
+    case 'settings': view='settings'; render(); break;
+    case 'start': startReview(); break;
+    case 'cram': startCram(); break;
+    case 'sent': startSentences(); break;
+    case 'say': speak(b.dataset.t); break;
+    case 'intro': introDone(); break;
+    case 'opt': pickOpt(+b.dataset.i); break;
+    case 'check': sess.kind==='sent' ? checkSent(false) : checkType(false); break;
+    case 'dunno': sess.kind==='sent' ? checkSent(true) : checkType(true); break;
+    case 'next': if(sess && sess.answered) next(); break;
+    case 'end': clearTimeout(sess.timer); if(sess.n) finish(); else { sess=null; view='home'; render(); } break;
+    case 'key': {
+      const inp = $('#ans'); if(!inp || inp.disabled) break;
+      const k = b.dataset.k;
+      inp.value = k==='DEL' ? inp.value.slice(0,-1) : inp.value + k;
+      if(window.matchMedia('(pointer: fine)').matches) inp.focus({preventScroll:true});
+      break;
+    }
+    case 'tile': { const c=sess.cur, i=+b.dataset.i; if(!sess.answered && !c.placed.includes(i)){ c.placed.push(i); drawTiles(); } break; }
+    case 'untile': { if(!sess.answered){ sess.cur.placed.splice(+b.dataset.i,1); drawTiles(); } break; }
+    case 'seg': { const k=b.dataset.k; S.set[k]=Number(b.dataset.v); save(); renderSettings(); break; }
+    case 'export': {
+      const blob = new Blob([JSON.stringify(S, null, 1)], {type:'application/json'});
+      const u = URL.createObjectURL(blob), l = document.createElement('a');
+      l.href = u; l.download = `fpa-hebrew-progress-${today()}.json`; document.body.appendChild(l); l.click(); l.remove();
+      setTimeout(() => URL.revokeObjectURL(u), 1000);
+      break;
+    }
+    case 'import': $('#imp').click(); break;
+    case 'reset':
+      if(confirm('Reset all progress? This cannot be undone.')){ S = {cards:{}, sent:{}, days:{}, newLog:{}, set:S.set}; save(); view='home'; render(); }
+      break;
+  }
+});
+document.addEventListener('change', e => {
+  const k = e.target.dataset && e.target.dataset.set; if(!k) return;
+  S.set[k] = e.target.type==='checkbox' ? e.target.checked : e.target.value; save();
+});
+$('#imp').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const x = JSON.parse(r.result);
+      if(!x || typeof x.cards!=='object') throw new Error('No progress found in this file.');
+      if(!confirm('Replace progress in this browser with the imported file?')) return;
+      S = {cards:x.cards, sent:x.sent||{}, days:x.days||{}, newLog:x.newLog||{}, set:{...DEFAULTS, ...(x.set||{})}};
+      save(); view='home'; render();
+    }catch(err){ alert('Import failed: ' + err.message); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+});
+document.addEventListener('keydown', e => {
+  if(view!=='session' || !sess) return;
+  const inInput = e.target.tagName==='INPUT';
+  const it = sess.q[sess.i]; if(!it) return;
+  if(e.key==='Escape'){ e.preventDefault(); $('[data-a="end"]').click(); return; }
+  if(sess.answered){ if(e.key==='Enter' || (!inInput && e.key===' ')){ e.preventDefault(); next(); } return; }
+  if(sess.kind==='words' && it.t==='intro'){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); introDone(); } return; }
+  if(e.key==='Enter'){ if(sess.kind==='sent' || sess.cur.type==='type'){ e.preventDefault(); sess.kind==='sent' ? checkSent(false) : checkType(false); } return; }
+  if(!inInput && /^[1-4]$/.test(e.key) && sess.cur.opts){ pickOpt(+e.key-1); return; }
+  if(!inInput && (e.key===' ' || e.key.toLowerCase()==='r')){ e.preventDefault(); replay(); }
+});
 
-function renderPlay(){
-    if(sIdx>=sW.length){showComplete();return}
-    ans=false;curW=null;curS=null;const item=sW[sIdx];
-    const total=st.ok+st.no;const acc=total>0?Math.round(st.ok/total*100):100;
-    const pct=sW.length<999?Math.round(sIdx/sW.length*100):0;
-    
-    // Determine exercise type
-    let exMode=mode;
-    if(mode==='auto')exMode=autoMode(item);
-    if(mode==='sentences')exMode='sentence';
-    
-    const isSent=exMode==='sentence'||exMode==='cloze'||exMode==='reorder';
-    if(isSent){curS=item}else{curW=item}
-    
-    let contentHtml='';
-    if(exMode==='expose')contentHtml=renderExpose(item);
-    else if(exMode==='mc')contentHtml=renderMC(item);
-    else if(exMode==='type')contentHtml=renderType(item);
-    else if(exMode==='reverse')contentHtml=renderReverse(item);
-    else if(exMode==='audio')contentHtml=renderAudio(item);
-    else if(exMode==='sentence')contentHtml=renderSentence(item);
-    else if(exMode==='cloze')contentHtml=renderCloze(item);
-    else if(exMode==='reorder')contentHtml=renderReorder(item);
-    else contentHtml=renderType(item);
-    
-    E('app').innerHTML=`
-    <div class="hdr">
-        <div class="hdr-l"><div class="hdr-btn" onclick="goHome()">←</div><div style="font-size:12px;color:var(--tx2)">${sW.length<999?`${sIdx+1}/${sW.length}`:'∞'}</div></div>
-        <div class="hdr-r">
-            <div class="ts" style="padding:4px 10px;min-width:0"><div class="ts-v flame" style="font-size:14px"><span class="flame-icon ${st.str>=5?'hot':''}">${st.str>=5?'🔥':'⚡'}</span>${st.str}</div></div>
-            <div class="ts" style="padding:4px 10px;min-width:0"><div class="ts-v" style="font-size:14px;color:var(--ac)">${acc}%</div></div>
-        </div>
-    </div>
-    ${sW.length<999?`<div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div></div>`:''}
-    <div class="main-card" id="mc">
-        <div class="hbar" id="hbar"></div>
-        <div class="content">${contentHtml}</div>
-        <div class="fb" id="fb"><div class="fb-icon" id="fb-i"></div><div class="fb-body"><div class="fb-ans" id="fb-a"></div><div class="fb-hint" id="fb-h"></div></div><div><button class="btn btn-p btn-sm" onclick="nxt()">Next →</button> <button class="btn btn-s btn-sm" onclick="speakCur()">🔊</button></div></div>
-        <div class="conf-alert" id="conf-a" style="display:none"><div class="conf-title">⚡ Watch out — commonly confused</div><div class="conf-row" id="conf-r"></div></div>
-    </div>`;
-    if(exMode==='audio')speakHe(he1(item))}
-
-// ── RENDER EXERCISE TYPES ──
-
-function renderExpose(w){
-    const s=srs[w.en];const correct=he1(w);
-    // Active exposure: pick from 2 easy options (#2)
-    let dist=V.filter(v=>v.en!==w.en&&v.t===w.t).map(v=>he1(v));sh(dist);
-    const wrong=dist[0]||'—';const opts=sh([correct,wrong]);
-    return`<div class="expose">
-        <div class="prompt-he">${correct}</div>
-        <div class="expose-en">${w.en}</div>
-        <div class="expose-hint">${w.h}</div>
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">Tap the matching Hebrew:</div>
-        <div class="expose-match">${opts.map(o=>`<div class="expose-opt" onclick="exposePick(this,'${esc(o)}','${esc(correct)}')">${o}</div>`).join('')}</div>
-        <button class="btn btn-s btn-sm" onclick="speakHe('${esc(correct)}')">🔊 Listen</button>
-    </div>`}
-
-function renderMC(w){
-    const correct=he1(w);let dist=V.filter(v=>v.en!==w.en&&v.t===w.t).map(v=>he1(v));sh(dist);dist=dist.slice(0,3);
-    if(dist.length<3){dist=dist.concat(V.filter(v=>v.en!==w.en).map(v=>he1(v)).slice(0,3-dist.length))}
-    const opts=sh([correct,...dist]);
-    return`<div class="prompt">${w.en}</div><div class="ctx">${w.ctx?'"'+w.ctx[0]+'"':''}</div>
-    <div class="mc-grid">${opts.map(o=>`<div class="mc-o" onclick="mcPick(this,'${esc(o)}','${esc(correct)}')">${o}</div>`).join('')}</div>
-    <div class="arow"><button class="btn btn-s btn-sm" onclick="hint('${esc(w.h)}')">💡</button></div>`}
-
-function renderType(w){
-    return`<div class="prompt">${w.en}</div><div class="ctx">${w.ctx?'"'+w.ctx[0]+'"':''}</div>
-    <div class="irow"><input class="hinput" id="inp" placeholder="הקלד בעברית..." autocomplete="off"></div>
-    <div class="arow"><button class="btn btn-p" onclick="submitType()">Check</button><button class="btn btn-s btn-sm" onclick="hint('${esc(w.h)}')">💡</button><button class="btn btn-s btn-sm" onclick="skipW()">Skip</button></div>`}
-
-function renderReverse(w){
-    return`<div class="prompt-he">${he1(w)}</div><div class="ctx">${w.h}</div>
-    <div class="irow"><input class="einput" id="inp" placeholder="Type English..." autocomplete="off"></div>
-    <div class="arow"><button class="btn btn-p" onclick="submitReverse()">Check</button><button class="btn btn-s btn-sm" onclick="skipW()">Skip</button></div>`}
-
-function renderAudio(w){
-    return`<div style="text-align:center"><button class="audio-big" onclick="speakHe('${esc(he1(w))}')">🔊</button>
-    <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">Listen and choose the English meaning</div></div>
-    <div class="mc-grid">${(()=>{let d=V.filter(v=>v.en!==w.en).map(v=>v.en);sh(d);d=d.slice(0,3);return sh([w.en,...d]).map(o=>`<div class="mc-o" style="direction:ltr;text-align:center;font-family:var(--f);font-size:14px" onclick="audioPick(this,'${esc(o)}','${esc(w.en)}')">${o}</div>`).join('')})()}</div>`}
-
-function renderSentence(s){
-    return`<div class="prompt" style="font-size:18px;line-height:1.4">${s.en}</div><div class="ctx"></div>
-    <textarea class="hinput" id="sinp" style="width:100%;min-height:60px;resize:none;font-size:18px" placeholder="הקלד את התרגום..."></textarea>
-    <div class="arow" id="sact"><button class="btn btn-p" onclick="submitSent()">Check</button><button class="btn btn-s btn-sm" onclick="sentHint()">💡</button><button class="btn btn-s btn-sm" onclick="revealSent()">Reveal</button><button class="btn btn-s btn-sm" onclick="speakHe('${esc(s.he)}')">🔊</button></div>
-    <div id="srev"></div>`}
-
-function renderCloze(s){
-    const words=s.he.split(/\s+/);const blanks=s.cl||[0];
-    let h='<div class="cloze-s">';words.forEach((w,i)=>{if(blanks.includes(i))h+=`<input class="cloze-inp" data-a="${w}" placeholder="___">`;else h+=w+' '});h+='</div>';
-    return`<div class="prompt" style="font-size:18px;line-height:1.4">${s.en}</div><div class="ctx"></div>${h}
-    <div class="arow" id="sact"><button class="btn btn-p" onclick="submitCloze()">Check</button><button class="btn btn-s btn-sm" onclick="sentHint()">💡</button><button class="btn btn-s btn-sm" onclick="speakHe('${esc(s.he)}')">🔊</button></div>
-    <div id="srev"></div>`}
-
-function renderReorder(s){
-    const w=s.w||[];const sf=sh([...w]);
-    return`<div class="prompt" style="font-size:18px;line-height:1.4">${s.en}</div>
-    <div style="font-size:11px;color:var(--tx3);margin:8px 0">Arrange right-to-left:</div>
-    <div class="reorder-zone" id="rz"></div>
-    <div class="reorder-bank" id="rb">${sf.map(x=>`<div class="wchip" data-h="${x.h}" onclick="placeW(this)">${x.h}<span class="wchip-en">${x.e}</span></div>`).join('')}</div>
-    <div class="arow" id="sact"><button class="btn btn-p" onclick="submitReorder()">Check</button><button class="btn btn-s btn-sm" onclick="clearR()">↩</button><button class="btn btn-s btn-sm" onclick="speakHe('${esc(s.he)}')">🔊</button></div>
-    <div id="srev"></div>`}
-
-function esc(s){return(s||'').replace(/'/g,"\\'")}
-
-// ── INTERACTION HANDLERS ──
-
-function exposePick(el,chosen,correct){
-    if(ans)return;ans=true;
-    document.querySelectorAll('.expose-opt').forEach(o=>o.style.pointerEvents='none');
-    if(norm(chosen)===norm(correct)){el.classList.add('right');const s=srs[curW.en];s.exp=(s.exp||0)+1;recOk(curW)}
-    else{el.classList.add('wrong');document.querySelectorAll('.expose-opt').forEach(o=>{if(norm(o.textContent)===norm(correct))o.classList.add('right')});const s=srs[curW.en];s.exp=(s.exp||0)+1;sv()}
-    setTimeout(nxt,800)}
-
-function mcPick(el,chosen,correct){
-    if(ans)return;ans=true;document.querySelectorAll('.mc-o').forEach(o=>o.classList.add('dis'));
-    if(norm(chosen)===norm(correct)){el.classList.add('ok');recOk(curW)}
-    else{el.classList.add('no');document.querySelectorAll('.mc-o').forEach(o=>{if(norm(o.textContent)===norm(correct))o.classList.add('hl')});recNo(curW);logErr(curW,chosen)}
-    showFB(norm(chosen)===norm(correct))}
-
-function audioPick(el,chosen,correct){
-    if(ans)return;ans=true;document.querySelectorAll('.mc-o').forEach(o=>o.classList.add('dis'));
-    if(chosen===correct){el.classList.add('ok');recOk(curW)}else{el.classList.add('no');document.querySelectorAll('.mc-o').forEach(o=>{if(o.textContent===correct)o.classList.add('hl')});recNo(curW)}
-    showFB(chosen===correct)}
-
-function submitType(){
-    if(ans||!curW)return;ans=true;const inp=E('inp');if(!inp)return;const uv=inp.value.trim();inp.disabled=true;
-    const ca=Array.isArray(curW.he)?curW.he:[curW.he];const ok=ca.some(h=>norm(h)===norm(uv));
-    if(ok)recOk(curW);else{recNo(curW);logErr(curW,uv)}showFB(ok)}
-
-function submitReverse(){
-    if(ans||!curW)return;ans=true;const inp=E('inp');if(!inp)return;const uv=inp.value.trim().toLowerCase();inp.disabled=true;
-    const en=curW.en.toLowerCase().replace(/\s*\(.*?\)/g,'').replace(/\s*\/\s*/g,'|');
-    const ok=en.split('|').some(v=>uv===v.trim()||uv===v.trim().replace('to ',''));
-    if(ok)recOk(curW);else recNo(curW);showFB(ok,true)}
-
-function submitSent(){
-    if(ans||!curS)return;ans=true;const inp=E('sinp');if(!inp)return;inp.disabled=true;
-    const sc=scoreSent(inp.value.trim(),curS.he);showSentReveal(sc);
-    if(sc<70&&curS.w)curS.w.forEach(w=>{const m=V.find(v=>v.he.some(h=>h===w.h)||he1(v)===w.h);if(m&&srs[m.en])srs[m.en].box=Math.max(0,srs[m.en].box-1)});sv()}
-
-function submitCloze(){
-    if(ans)return;ans=true;let tot=0,cor=0;
-    document.querySelectorAll('.cloze-inp').forEach(inp=>{tot++;if(norm(inp.value.trim())===norm(inp.dataset.a)){cor++;inp.classList.add('ok')}else{inp.classList.add('no');inp.value=inp.dataset.a}});
-    showSentReveal(tot>0?Math.round(cor/tot*100):0)}
-
-function placeW(chip){if(ans||chip.classList.contains('placed'))return;chip.classList.add('placed');
-    const c=document.createElement('div');c.className='wchip inz';c.textContent=chip.dataset.h;c.dataset.h=chip.dataset.h;
-    c.onclick=()=>{c.remove();chip.classList.remove('placed')};E('rz').appendChild(c)}
-function clearR(){if(ans)return;E('rz').innerHTML='';document.querySelectorAll('.wchip').forEach(c=>c.classList.remove('placed'))}
-function submitReorder(){
-    if(ans||!curS)return;ans=true;const placed=[...E('rz').querySelectorAll('.wchip')].map(c=>c.dataset.h);
-    const correct=curS.w.map(w=>w.h);let m=0;placed.forEach((w,i)=>{if(i<correct.length&&w===correct[i])m++});
-    showSentReveal(correct.length>0?Math.round(m/correct.length*100):0)}
-
-function revealSent(){if(ans)return;ans=true;showSentReveal(0)}
-function sentHint(){if(!curS)return;const bar=E('hbar');bar.textContent='💡 '+curS.w.slice(0,4).map(w=>w.e+'='+w.h).join(' · ');bar.style.display='block'}
-
-function scoreSent(inp,cor){const cw=cor.replace(/[^\u0590-\u05FF\s]/g,'').split(/\s+/).filter(w=>w.length>1);const uw=inp.replace(/[^\u0590-\u05FF\s]/g,'').split(/\s+/).filter(w=>w.length>1);let m=0;cw.forEach(c=>{if(uw.some(u=>u===c||u.includes(c)||c.includes(u)))m++});return cw.length>0?Math.round(m/cw.length*100):0}
-
-function showSentReveal(score){
-    const s=curS;const cls=score>=70?'g':score>=30?'p':'m';const col=score>=70?'gn':score>=30?'or':'rd';
-    const bd=s.w?s.w.map(w=>`<div class="bd"><div class="bd-he">${w.h}</div><div class="bd-en">${w.e}</div></div>`).join(''):'';
-    E('srev').innerHTML=`<div class="srev">
-        <div class="score ${cls}"><span class="score-v" style="color:var(--${col})">${score}%</span> ${score>=70?'Great!':score>=30?'Partial':'Review below'}</div>
-        <div class="srev-he">${s.he}</div><div class="srev-hint">${s.h}</div>
-        ${bd?'<div class="bdown">'+bd+'</div>':''}
-        <div class="arow" style="margin-top:8px"><button class="btn btn-p btn-sm" onclick="rateSent('ok')">Next →</button>
-        <button class="btn btn-s btn-sm" style="color:var(--rd)" onclick="rateSent('hard')">Hard</button>
-        <button class="btn btn-s btn-sm" style="color:var(--gn)" onclick="rateSent('easy')">Easy</button>
-        <button class="btn btn-s btn-sm" onclick="speakHe('${esc(s.he)}')">🔊</button></div></div>`;
-    const sa=E('sact');if(sa)sa.style.display='none';if(score>=70)sOk++;else sNo++;updatePanel()}
-
-function rateSent(r){if(curS){const k='s'+curS._i;const d=ssrs[k]||{box:0};if(r==='easy')d.box=Math.min(4,d.box+2);else if(r==='ok')d.box=Math.min(4,d.box+1);else d.box=0;ssrs[k]=d;sv()}sIdx++;renderPlay()}
-
-function showFB(ok,rev){
-    const fb=E('fb');if(!fb)return;
-    if(curW){const hd=Array.isArray(curW.he)?curW.he.join(' / '):curW.he;
-        if(rev){E('fb-a').textContent=curW.en;E('fb-a').style.direction='ltr';E('fb-a').style.fontFamily='var(--f)'}
-        else{E('fb-a').textContent=hd;E('fb-a').style.direction='rtl';E('fb-a').style.fontFamily='var(--h)'}
-        E('fb-h').textContent=curW.h}
-    E('fb-i').textContent=ok?'✓':'✗';fb.className=`fb ${ok?'ok':'no'}`;
-    const mc=E('mc');if(mc){if(ok)mc.classList.add('pulse-g');else mc.classList.add('shake');setTimeout(()=>{if(mc){mc.classList.remove('pulse-g');mc.classList.remove('shake')}},400)}
-    if(!ok)showConf();updatePanel()}
-
-function showConf(){if(!curW)return;const p=CONF.find(([,,e1,e2])=>e1===curW.en||e2===curW.en);if(!p)return;
-    const ca=E('conf-a');const cr=E('conf-r');if(!ca||!cr)return;ca.style.display='block';
-    cr.innerHTML=`<div class="conf-item"><div class="conf-he">${p[0]}</div><div class="conf-en">${p[2]}</div></div><div style="color:var(--pr);font-weight:700">≠</div><div class="conf-item"><div class="conf-he">${p[1]}</div><div class="conf-en">${p[3]}</div></div>`}
-
-function nxt(){sIdx++;renderPlay()}
-function skipW(){if(ans)return;ans=true;recNo(curW);showFB(false)}
-function hint(h){const bar=E('hbar');if(bar){bar.textContent='💡 '+h;bar.style.display='block'}}
-function speakCur(){if(curW)speakHe(he1(curW))}
-
-function showComplete(){
-    const t=sOk+sNo,a=t>0?Math.round(sOk/t*100):100;
-    E('ov-ok').textContent=sOk;E('ov-no').textContent=sNo;E('ov-ac').textContent=a+'%';
-    E('ov-t').textContent=a>=90?'🔥 Excellent!':a>=70?'Good Session':'Keep Grinding';
-    E('ov-s').textContent=a>=90?'Interview-ready pace.':a>=70?"Review weak words next.":"Try Auto mode — it'll adapt to you.";
-    E('ov').classList.add('show')}
-
-// Error logging (#9)
-function logErr(w,input){if(!w)return;const k=w.en;if(!errs[k])errs[k]=[];errs[k].push(input);if(errs[k].length>5)errs[k]=errs[k].slice(-5);sv()}
-function getConfPairs(){let p=[];CONF.forEach(([h1,h2,e1,e2])=>{const e1d=errs[e1]||[],e2d=errs[e2]||[];const c=e1d.some(e=>norm(e)===norm(h2))||e2d.some(e=>norm(e)===norm(h1));if(c||(srs[e1]&&srs[e1].tw>1&&srs[e2]&&srs[e2].tw>1))p.push([h1,h2,e1,e2])});return p}
-
-// ═══════════════════════════════════════
-// SLIDE PANEL
-// ═══════════════════════════════════════
-function openPanel(){E('pan-ov').classList.add('show');E('panel').classList.add('show');updatePanel()}
-function closePanel(){E('pan-ov').classList.remove('show');E('panel').classList.remove('show')}
-
-function updatePanel(){
-    // Targets
-    const mas=V.filter(w=>(srs[w.en]||{}).box>=4).length;
-    const fam=V.filter(w=>(srs[w.en]||{}).box>=2).length;
-    const sentDone=S.filter((_,i)=>(ssrs['s'+i]||{}).box>=2).length;
-    const tgts=[{t:`Master 20 words (${Math.min(mas,20)}/20)`,d:mas>=20},{t:`${fam} familiar+ (goal:${Math.round(V.length*.6)})`,d:fam>=Math.round(V.length*.6)},{t:`5 sentences done (${Math.min(sentDone,5)}/5)`,d:sentDone>=5},{t:`10-streak achieved`,d:st.best>=10}];
-    E('p-targets').innerHTML=tgts.map(t=>`<div class="tgt"><div class="tgt-ck ${t.d?'done':''}">${t.d?'✓':''}</div><span class="tgt-tx ${t.d?'done':''}">${t.t}</span></div>`).join('');
-    // SRS
-    let c=[0,0,0,0,0];V.forEach(w=>{c[(srs[w.en]||{}).box||0]++});
-    E('p-srs').innerHTML=['New/Hard','Learning','Familiar','Strong','Mastered'].map((l,i)=>`<div class="srs-r"><div class="srs-d b${i}"></div><span class="srs-l">${l}</span><span class="srs-c">${c[i]}</span></div>`).join('');
-    // Conf pairs
-    const cp=getConfPairs();E('p-conf-ct').textContent=cp.length;
-    E('p-conf').innerHTML=cp.length?cp.map(([h1,h2,,])=>`<div class="cp-row"><span class="mi-he">${h1}</span><span class="cp-vs">≠</span><span class="mi-he">${h2}</span></div>`).join(''):'<div class="empty">No confusion patterns yet</div>';
-    E('drill-conf-btn').style.display=cp.length>0||CONF.length>0?'block':'none';
-    // Misses
-    const misses=V.filter(w=>(srs[w.en]||{}).tw>0).sort((a,b)=>srs[b.en].tw-srs[a.en].tw).slice(0,15);
-    E('p-miss-ct').textContent=misses.length;
-    E('p-miss').innerHTML=misses.length?misses.map(w=>`<div class="mi"><span class="mi-en">${w.en}</span><span><span class="mi-he">${he1(w)}</span><span class="mi-c">×${srs[w.en].tw}</span></span></div>`).join(''):'<div class="empty">No misses yet</div>'}
-
-function resetAll(){if(!confirm("Reset all progress?"))return;srs={};ssrs={};errs={};st={ok:0,no:0,str:0,best:0};
-[K1,K2,K3,K4].forEach(k=>localStorage.removeItem(k));ld();goHome()}
-
-// ═══════════════════════════════════════
-// KEYBOARD
-// ═══════════════════════════════════════
-document.addEventListener('keydown',e=>{
-    if(screen!=='play')return;
-    const a=document.activeElement;const isInp=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();
-        if(ans){const nb=document.querySelector('.srev .btn-p');if(nb)nb.click();else nxt()}
-        else{if(mode==='sentences'||mode==='cloze'||mode==='reorder'){const s=E('sinp');if(s)submitSent();else if(document.querySelector('.cloze-inp'))submitCloze();else submitReorder()}
-        else if(mode!=='mc'&&mode!=='audio'&&mode!=='auto'){submitType()}
-        else if(mode==='auto'&&E('inp')){submitType()}}}
-    if(!isInp&&(e.key==='h'||e.key==='H')&&curW){hint(curW.h)}
-    if(!isInp&&(e.key==='s'||e.key==='S')){if(curS)revealSent();else skipW()}});
-
-// INIT
-document.addEventListener('DOMContentLoaded',()=>{ld();renderHome();
-    // Preload voices
-    speechSynthesis.getVoices()});
+render();
+})();
 </script>
 </body>
 </html>
